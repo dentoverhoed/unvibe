@@ -19,7 +19,7 @@ The skill is two files: `skills/kickstart/SKILL.md` routes to sections of `skill
 
 ### What makes a good change
 - **It fixes something an agent actually got wrong.** Show the run where it went wrong. "This would be nicer" is not enough.
-- **It's short.** Prefer one precise sentence over a paragraph. If a rule can be checked mechanically, add a check, not prose.
+- **It's short.** Prefer one precise sentence over a paragraph. If a rule can be checked mechanically, add a check, not prose. `check_skill.py` holds a word budget for the skill; raising it needs a reason in your PR.
 - **It's phrased positively.** Write "use X", not "NEVER do Y", and leave out CAPITALS and IMPORTANT.
 - **It keeps routing intact.** SKILL.md points to runbook sections by heading name. If you rename a heading, update the route. `scripts/check_skill.py` catches mismatches.
 - **It's credited.** A new practice names its source, which goes in the README credits.
