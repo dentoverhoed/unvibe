@@ -228,7 +228,7 @@ Run the tool once end to end. That is the proof this step is done.
   - show the diff;
   - after applying, check with `/hooks`;
   - check the schema against the current Claude Code docs.
-  - On Windows, hooks run through Git Bash, so test them on the team's machines.
+  - On Windows, hooks run in Git Bash, or in PowerShell if Git Bash is missing. Set `"shell": "bash"` on a hook that needs bash, and test on the team's machines.
 
   Example for illustration:
   ```json
