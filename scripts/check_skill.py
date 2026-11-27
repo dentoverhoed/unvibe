@@ -8,6 +8,8 @@
 3. Block names agree: Phase 2 table = Phase 3 heading = README table, and
    every block letter has its own Phase 3 section.
 4. Relative links in tracked Markdown files point to files that exist.
+5. Size budget: the skill is loaded into the agent's context on every run,
+   so it may only grow when a PR raises WORD_BUDGET on purpose.
 """
 import re
 import subprocess
@@ -17,6 +19,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SKILL_DIR = ROOT / "skills" / "kickstart"
 errors = []
+
+# Ratchet: just above the current size. Raise a number only in a PR that
+# explains why the extra words earn their context.
+WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 4350}
 
 
 def read(path):
@@ -75,8 +81,17 @@ for rel in tracked:
         if not (ROOT / rel).parent.joinpath(target.split("#")[0]).exists():
             errors.append(f"{rel}: broken link -> {target}")
 
+# 5. Size budget
+sizes = {}
+for name, budget in WORD_BUDGET.items():
+    sizes[name] = len(read(SKILL_DIR / name).split())
+    if sizes[name] > budget:
+        errors.append(f"{name} is {sizes[name]} words, over its budget of {budget}. "
+                      f"Cut {sizes[name] - budget} words (shorter sentences, or a check instead of prose), "
+                      f"or raise WORD_BUDGET in scripts/check_skill.py and say why in the PR")
+
 print(f"checked: frontmatter, {len(headings)} headings, blocks {', '.join(table)}, "
-      f"links in {len(tracked)} files")
+      f"links in {len(tracked)} files, size {sizes}")
 if errors:
     print("FAIL")
     print("\n".join(f"  - {e}" for e in errors))
