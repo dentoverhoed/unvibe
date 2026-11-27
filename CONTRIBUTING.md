@@ -1,0 +1,36 @@
+# Contributing to unvibe
+
+Thanks for helping. There are two useful things you can do.
+
+## 1. Tell us how `/kickstart` went
+
+Ran it on your repo? [Open a run report](https://github.com/dentoverhoed/unvibe/issues/new?template=run-report.yml). It takes two minutes. The most useful reports include:
+- the stack;
+- the command you typed;
+- what the agent did, and what you expected.
+
+One concrete repro beats ten opinions.
+
+Before you paste output, remove secrets, customer data and internal URLs. `/kickstart` never prints secret values, but your code might.
+
+## 2. Improve the skill
+
+The skill is two files: `skills/kickstart/SKILL.md` routes to sections of `skills/kickstart/runbook.md`. Both are prompts, so every line costs the agent context on every run.
+
+### What makes a good change
+- **It fixes something an agent actually got wrong.** Show the run where it went wrong. "This would be nicer" is not enough.
+- **It's short.** Prefer one precise sentence over a paragraph. If a rule can be checked mechanically, add a check, not prose.
+- **It's phrased positively.** Write "use X", not "NEVER do Y", and leave out CAPITALS and IMPORTANT.
+- **It keeps routing intact.** SKILL.md points to runbook sections by heading name. If you rename a heading, update the route. `scripts/check_skill.py` catches mismatches.
+- **It's credited.** A new practice names its source, which goes in the README credits.
+
+### Before you open a PR
+1. Run `python scripts/check_skill.py`. CI runs it too.
+2. Build the demo shop: `python examples/make_demo_shop.py ../demo-shop`.
+3. Run the [eval scenarios](evals/README.md) your change affects, at least scenario 1.
+4. Using Claude Code? Ask the read-only `reviewer` agent in `.claude/agents/` to review your diff in a fresh context.
+5. Fill in the PR template, including the evals table. You must have read and tested your own PR before asking anyone else to.
+
+## License
+
+By contributing you agree that your contribution is licensed under the [MIT License](LICENSE).

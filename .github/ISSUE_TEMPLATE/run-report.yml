@@ -1,0 +1,62 @@
+name: Run report
+description: Tell us how /kickstart went on your repo, good or bad.
+title: "[run] "
+labels: ["run-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! One concrete run beats ten opinions.
+        **Before pasting output, remove secrets, customer data and internal URLs.**
+  - type: input
+    id: agent
+    attributes:
+      label: Agent and model
+      placeholder: "Claude Code, Opus 5.5"
+    validations:
+      required: true
+  - type: input
+    id: stack
+    attributes:
+      label: Stack and repo size
+      placeholder: "Next.js + Supabase, ~40k lines, vibe-coded over 6 months"
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command you typed
+      placeholder: "/kickstart   or   /kickstart F1"
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: The agent's final answer, and anything it did that surprised you.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Overall
+      options:
+        - Useful as is
+        - Useful, but something was off
+        - Not useful
+        - It broke a rule (edited files during the audit, opened .env, skipped a STOP…)
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed secrets, customer data and internal URLs from everything above.
+          required: true
