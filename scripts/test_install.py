@@ -8,7 +8,10 @@ copies installed without this script. It temporarily edits skills/kickstart/
 and restores it with git, so it refuses to run when that folder has
 uncommitted changes. Needs the full git history (CI: fetch-depth 0).
 """
-import json, subprocess, sys, tempfile
+import json
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -19,12 +22,12 @@ results = []
 def run(name, *extra, expect):
     out = subprocess.run([sys.executable, "-I", "scripts/install.py", "--project", str(PROJ), *extra],
                          cwd=REPO, capture_output=True, text=True)
-    lines = [l for l in (out.stdout + out.stderr).splitlines() if not l.startswith(("skill:", "target:"))]
+    lines = [line for line in (out.stdout + out.stderr).splitlines() if not line.startswith(("skill:", "target:"))]
     ok = out.returncode == expect
     results.append(ok)
     print(f"{'OK ' if ok else 'BAD'} {name}: exit={out.returncode} (expected {expect})")
-    for l in lines:
-        print(f"      {l}")
+    for line in lines:
+        print(f"      {line}")
 
 
 def git(*a, **kw):

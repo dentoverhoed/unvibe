@@ -1,0 +1,2 @@
+# Dev tools for CI. Dependabot keeps these pins up to date.
+ruff==0.17.6
