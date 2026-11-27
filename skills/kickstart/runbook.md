@@ -252,7 +252,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
   - Gets the standards **pushed** into its prompt; the implementer has to look them up itself.
 - **Axes:**
   1. **Spec**: was what was asked for built?
-  2. **Correctness and standards**
+  2. **Correctness and standards**, including what agents typically get wrong: does a type or compile fix change meaning? Does every new mechanism (cache, retry, layer) answer a stated requirement? Is dead code left behind? Are the assumptions written down?
   3. **Security**: always on.
 - **Fixed sentence in the review prompt:** "report gaps that affect correctness, skip style". A reviewer asked to find problems always finds something, and not every finding needs fixing.
 - **PR template with evidence and merge danger** (Appendix E).
