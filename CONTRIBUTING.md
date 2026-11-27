@@ -31,6 +31,20 @@ The skill is two files: `skills/kickstart/SKILL.md` routes to sections of `skill
 4. Using Claude Code? Ask the read-only `reviewer` agent in `.claude/agents/` to review your diff in a fresh context.
 5. Fill in the PR template, including the evals table. You must have read and tested your own PR before asking anyone else to.
 
+## Decisions we already made
+
+Proposals that reopen these are welcome, but they need new evidence.
+
+| Decision | Why | Rejected |
+|---|---|---|
+| Install by **copying** (`scripts/install.py`) | The installed skill changes only when you run the script, never because a branch with half-finished edits is checked out | A symlink or junction to the repo. A Claude Code plugin is deferred, not rejected. |
+| **No markdownlint** | All 353 hits were style rules (line length, blank lines). Reformatting the runbook costs context and catches nothing that breaks. | Linting with most rules disabled. `check_skill.py` checks structure instead. |
+| **Evals run by hand**, not in CI | Each run costs tokens, and a person has to judge behaviour. The results go into the PR. | A `claude -p` runner on every push |
+| A **word budget**, not a fixed cap | It sits just above today's size, so raising it is a visible, explained change in a PR | A hard cap with lots of slack, which never bites |
+| The fixture is **generated**, not committed | A nested git repo with a committed `.env` can't live cleanly inside this repo. Fixed dates keep its hashes stable. | A git bundle or tarball, which is binary and unreviewable |
+| External links are checked **weekly** | A flaky site should never block a contribution. Relative links are checked on every PR. | Lychee on every PR |
+| **No auto-merge**, including Dependabot | Every change to the skill or CI gets a human decision | Auto-merging two-way doors |
+
 ## License
 
 By contributing you agree that your contribution is licensed under the [MIT License](LICENSE).
