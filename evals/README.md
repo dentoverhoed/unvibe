@@ -9,10 +9,11 @@
    python examples/make_demo_shop.py ../demo-shop
    ```
    You get a tiny webshop with 3 commits, `HEAD` at `b7fc963`. The script refuses a folder that isn't empty, or one inside this repo.
-2. **Install the skill you want to test** (your working copy), as in the main README. For example, on macOS / Linux:
+2. **Install the skill you want to test** (your working copy):
    ```bash
-   cp -r skills/kickstart ~/.claude/skills/
+   python scripts/install.py
    ```
+   It warns that you're installing uncommitted changes. That's expected here. Run it again after `git switch main` to go back to the released version.
 3. **Open `../demo-shop` in a new agent session.** Rebuild the fixture before each scenario that starts fresh.
 
 > The example report in `docs/example-report.md` came from an earlier run of the same fixture, so its commit hashes (`c3be5fc`, `d6e1e3c`, `4a60203`) differ from the ones you'll see (`b43e17d`, `a5ab331`, `b7fc963`). Files, line numbers and findings are the same.

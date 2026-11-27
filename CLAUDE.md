@@ -5,6 +5,7 @@ The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skil
 ## Commands
 - Checks: `python scripts/check_skill.py`. It covers frontmatter, routed headings, block names and relative links. CI also builds the fixture on Ubuntu, Windows and macOS.
 - Fixture: `python examples/make_demo_shop.py <folder outside this repo>`. It prints `HEAD: b7fc963 | self-test: 1 passed`.
+- Install: `python scripts/install.py`, or `--check` to see what's out of date. Tests: `python scripts/test_install.py`, which needs a clean `skills/kickstart/`.
 - Evals: the scenarios and MUST / MUST NOT tables are in `evals/README.md`.
 - Stop hook: `.claude/settings.json` runs the checks before you end a turn. If they fail, fix them first.
 - Review: use the read-only `reviewer` agent in `.claude/agents/` on a skill diff, in a fresh context.
