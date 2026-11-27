@@ -292,6 +292,7 @@ The security scan is a smoke test, not a pentest. Hooks target Claude Code's for
 | Swallowed errors as an audit signal and first ratchet | Armin Ronacher: ["Agentic Coding Recommendations"](https://lucumr.pocoo.org/2025/6/12/agentic-coding/); Liu et al.: ["Debt Behind the AI Boom"](https://arxiv.org/abs/2603.28592) |
 | Reviewer questions for typical agent mistakes (meaning-changing type fixes, unrequested mechanisms, dead code, silent assumptions) | Erik Doernenburg: ["Assessing internal quality while coding with an agent"](https://www.martinfowler.com/articles/exploring-gen-ai/ccmenu-quality.html); Andrej Karpathy: [notes on coding with Claude](https://x.com/karpathy/status/2015883857489522876) |
 | Split god files into modules behind locked characterisation tests; a human approves the cut plan | Giles Edwards-Alexander: ["The Economic Benefit of Refactoring"](https://martinfowler.com/articles/exploring-gen-ai/refactoring-economic-benefit.html); Markus Harrer: ["AI Agents Don't Modernize Legacy Code on Their Own"](https://www.isaqb.org/blog/ai-agents-dont-modernize-legacy-code-on-their-own/) |
+| Hotspots as churn × complexity; complexity trend and batch size instead of one snapshot | Adam Tornhill et al.: ["Code for Machines, Not Just Humans"](https://arxiv.org/abs/2601.02200); He et al.: ["Speed at the Cost of Quality"](https://arxiv.org/abs/2511.04427); DORA |
 | Error messages as "positive prompt injection" | Birgitta Böckeler: [Harness engineering](https://martinfowler.com/articles/harness-engineering.html) |
 
 ## Contributing

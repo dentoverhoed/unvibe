@@ -63,7 +63,8 @@ Work in this order. Use subagents or parallel searches for broad searching, and 
   - "six ways to do the same thing".
 
 ### 5. Hotspots
-- Run `git log` over the last ~3 months. Which files change most often?
+- Run `git log` over the last ~3 months of activity, counted back from the latest commit. Rank files by **change count × complexity**: use the repo's complexity tool if it has one, otherwise line count and deepest indentation. The top of that list are the A candidates.
+- **Trends, not verdicts:** complexity or warnings per KLOC at 2–3 older commits, read without writing files (`git show <commit>:<path>` piped into the measurement), and lines per commit (p50/p90, `git log --shortstat`).
 - Which commits are fixes or reverts, and which **kinds** of mistakes keep coming back?
 
 ### 6. Guardrail inventory
