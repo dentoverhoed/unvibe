@@ -35,7 +35,7 @@
 
 ## Phase 1A — Read-only audit of an EXISTING project
 
-Work in this order. Use subagents or parallel searches for broad searching, and note your findings for each step.
+Work in this order; use subagents or parallel searches for broad searching.
 
 ### 1. Run the tests first
 - Find the test command and run it. Note the number of tests, how many pass, the duration, and how to run **a single test file**.
@@ -70,24 +70,12 @@ Work in this order. Use subagents or parallel searches for broad searching, and 
 ### 6. Guardrail inventory
 Check what exists and what is missing:
 
-- **In the repo:**
-  - CI pipeline and the steps it runs
-  - pre-commit hooks
-  - lint rules
-  - module-boundary rules, such as dependency-cruiser, import-linter or ArchUnit-style tests
+- **In the repo:** CI and the steps it runs, pre-commit hooks, lint rules, module-boundary rules (dependency-cruiser, import-linter, ArchUnit-style tests).
 - **On the git host:** branch protection on `main`.
-- **Agent config:**
-  - `.claude/settings.json`: hooks, and deny rules for `.env` and secrets
-  - `CLAUDE.md` / `AGENTS.md`: size in lines, contents, and stale or contradictory instructions
-  - `.env` in `.gitignore`
+- **Agent config:** `.claude/settings.json` (hooks, deny rules for `.env` and secrets); `CLAUDE.md` / `AGENTS.md` (size in lines, contents, stale or contradictory instructions); `.env` in `.gitignore`.
 
 ### 7. Security quick scan
-Check these points. This is not a full audit:
-- secrets in code or in git history
-- input validation at the edges
-- authorization per action, not only per route
-- dependency advisories (`npm audit`, `pip-audit`, …)
-- debug or admin endpoints
+Not a full audit. Check secrets in code or git history, input validation at the edges, authorization per action (not only per route), dependency advisories (`npm audit`, `pip-audit`, …), and debug or admin endpoints.
 
 ### 8. Architecture signals
 - god files: large files with many responsibilities
@@ -134,11 +122,11 @@ Cover at least these points:
 
 | Order | Block | Why first |
 |---|---|---|
-| S | **Security-urgent**: rotate leaked secrets, open debug or admin endpoints, missing authorization | Comes before everything. Rewriting git history is a one-way door and needs a separate decision. |
+| S | **Security-urgent**: rotate leaked secrets, open debug or admin endpoints, missing authorization | First. A history rewrite is a separate, one-way decision. |
 | F | **Foundation**: tests run, single-file test, typecheck, lint, CI | Without this loop every later step is guesswork |
 | V | **Verification**: the agent can start the app, drive it and show evidence | Stops the human from being the bottleneck |
 | H | **Harness**: lean CLAUDE.md, hooks, deny rules, protected files | Enforce at harness level, not through prompts |
-| T | **Language and knowledge**: GLOSSARY.md, ADRs, knowledge store, coding standards | Shared language: fewer misunderstandings and better navigation |
+| T | **Language and knowledge**: GLOSSARY.md, ADRs, knowledge store, coding standards | Fewer misunderstandings, better navigation |
 | R | **Ratchet checks**: mechanical mistakes become checks that only block new violations | A mistake that happened twice does not come back |
 | Re | **Review setup**: fresh read-only reviewer, security axis, PR template | Catch mistakes before merge |
 | A | **Architecture**: hotspots become candidates, and you deepen one module at a time | Only worthwhile once F and V are in place |
@@ -152,7 +140,7 @@ Cover at least these points:
 
 ## Phase 3 — Execute: one action item per session
 
-General procedure for each action item:
+For each action item:
 1. New branch.
    - If this ID depends on an open ID, say so and propose doing that one first.
    - If files in `docs/agents/` are not yet committed, commit them first, as a separate commit on the branch.
@@ -164,7 +152,6 @@ General procedure for each action item:
 7. Update the status.
 
 ### S — Security-urgent
-Do these before any other block.
 - **Leaked secret:**
   - confirm it is tracked with `git ls-files <file>`, without opening it;
   - ask the user to rotate it at the provider. ⛔ **STOP** until they confirm. You never see or print the value;
@@ -217,7 +204,7 @@ Run the tool once end to end. That is the proof this step is done.
   - On Windows, hooks run in Git Bash, or in PowerShell if Git Bash is missing. Set `"shell": "bash"` on a hook that needs bash, and test on the team's machines.
 
   - **For example:** `permissions.deny`: `Read(./.env)`, `Read(./.env.*)`, `Read(./secrets/**)`; `permissions.ask`: `Bash(git push *)`; a `hooks.Stop` command hook like `npm run typecheck 1>&2 || exit 2`, so the agent can't report "done" while the check fails.
-  - **Optional:** a formatter after every edit (PostToolUse on `Edit|Write`), and a block on edits to protected files (migrations, lockfiles, `.git/`).
+  - **Edit-time blocks:** PreToolUse hooks that exit 2 on `Edit|Write` of protected files (migrations, lockfiles, `.git/`, locked tests) or new forbidden imports, and on `Bash` for `git commit --no-verify` (permission patterns are fragile for flags). Prove each with a violating and a clean stdin payload (exit 2, then 0). Bash writes bypass them; the Stop hook and CI stay the backstop. Optional: a formatter after every edit (PostToolUse).
 - **Branch protection on `main`** before any scheduled or cloud agents ever run.
 
 ### T — Language and knowledge
@@ -234,7 +221,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 
 ```
 1. Codebase / architecture  → make the mistake impossible (one way to do it, API design)
-2. Static analysis          → types, lint rule, boundary rule, test, CI
+2. Static analysis          → edit-time hook, types, lint rule, boundary rule, test, CI
 3. Verification             → runtime check via the verification tool
 4. Prose                    → CODING_STANDARDS.md / skill / CLAUDE.md (judgement calls only)
 5. Human review             → most expensive, last resort
@@ -244,7 +231,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 - **Existing violations** go into a baseline, so the rule only blocks new ones.
 - **Exceptions** live on the offending line itself, with a reason.
 - **A typical first ratchet:** swallowed errors from the audit. Baseline today's count and block new ones; the message says to handle the error or let it crash loudly.
-- **Module boundaries** are enforced with a dependency check: import only through a module's entry point, and no cycles.
+- **Module boundaries** are enforced with a dependency check (import-linter, dependency-cruiser): import only through a module's entry point, dependencies point one way between layers, no cycles. The full check runs in the Stop hook and CI.
 - Optional: a table "rule → what enforces it" in `CODING_STANDARDS.md`. Remove a rule once its mistake has become impossible.
 
 ### Re — Review setup
