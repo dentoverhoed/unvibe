@@ -297,9 +297,8 @@ The security scan is a smoke test, not a pentest. Hooks target Claude Code's for
 
 Tried it on your repo? We'd love to hear how it went.
 
-- **Issues:** the stack, what `/kickstart` did, and what you expected. A concrete repro is gold.
-- **PRs:** welcome for clear improvements. Please keep the runbook tight: every line costs the agent context.
-- **Changed the skill?** Run `python scripts/check_skill.py` (CI runs it too). Then rebuild the demo shop with `python examples/make_demo_shop.py ../demo-shop`, run the scenarios in [`evals/`](evals/README.md), and paste the results into your PR.
+- **[Open a run report](https://github.com/dentoverhoed/unvibe/issues/new?template=run-report.yml):** your stack, what `/kickstart` did, and what you expected. A concrete repro is gold.
+- **PRs:** welcome for clear improvements. Please keep the runbook tight: every line costs the agent context. [`CONTRIBUTING.md`](CONTRIBUTING.md) covers the checks, the [evals](evals/README.md) and the read-only reviewer agent.
 
 If `/kickstart` saved you from a 2 a.m. "why is prod down", consider leaving a ⭐. It helps other people find it.
 
