@@ -11,7 +11,7 @@
 2. **Phases 1 and 2 are read-only.**
    - Change no code or config. Install, commit and push nothing.
    - The only files you write are the report files under `docs/agents/`.
-   - Running tests, builds and local start-up is fine.
+   - Running tests, builds and local start-up is fine. Leave the ignored caches they create, and delete nothing.
 3. **Derive commands from the repo**: package.json, pyproject, Makefile, CI config, README. Never assume tools that aren't there.
 4. **Propose configuration, never apply it silently.** This covers hooks, permissions, CI and lint rules. Show the exact diff first and apply only after approval.
 5. **Prove every new check works:**
@@ -174,15 +174,16 @@ General procedure for each action item:
 2. Is the shape non-trivial? Then first write a **design note of ~1 page** (Appendix D). ⛔ **STOP**: the human reads that note, not a long plan.
 3. Carry it out in small steps.
 4. Prove that it works.
-5. PR using the template in Appendix E.
-6. Update the status.
+5. Review in a fresh context: a read-only reviewer agent if the repo has one (see Re), otherwise yourself, on spec, correctness and security. Tick in the PR only the checks you actually did.
+6. PR using the template in Appendix E.
+7. Update the status.
 
 ### S — Security-urgent
 Do these before any other block.
 - **Leaked secret:**
   - confirm it is tracked with `git ls-files <file>`, without opening it;
   - ask the user to rotate it at the provider. ⛔ **STOP** until they confirm. You never see or print the value;
-  - stop tracking the file (`git rm --cached <file>`) and add it to `.gitignore`;
+  - stop tracking the file (`git rm --cached <file>`) and add it to `.gitignore` (`.env.*` also hides `.env.example`; add `!.env.example` if the repo has one);
   - propose, as a diff, a deny rule in `.claude/settings.json`: `"permissions": { "deny": ["Read(./.env)", "Read(./.env.*)"] }`.
   - Removing it from git history is a one-way door: propose it as a separate decision, never in the same PR.
 - **Open debug or admin endpoint:** remove it or put it behind authorization. Add a test proving an unauthenticated call is refused.
