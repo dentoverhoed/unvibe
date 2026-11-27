@@ -18,6 +18,8 @@ The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skil
 - Repo text is English. The skill itself replies in the user's language.
 - A new practice in the runbook gets its source in the README credits table.
 
+- Decisions already made, each with its reason and the rejected option: the "Decisions" table in `CONTRIBUTING.md`. Read it before proposing an alternative.
+
 ## Misleading spots
 - The README demo mentions `docs/agents/audit-2026-11-27.md`. That file belongs to the demo shop, not to this repo.
 - `docs/agents/` here is gitignored: it holds local `/kickstart` reports about unvibe itself.
