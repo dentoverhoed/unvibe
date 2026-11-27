@@ -95,6 +95,7 @@ Check these points. This is not a full audit:
 - import cycles
 - logic spread over many places, so one change needs many edits (low locality)
 - tests that restate the implementation instead of testing behaviour
+- **swallowed errors:** empty or broad `catch`/`except`, `except Exception: pass`, `|| true`, `@ts-ignore`, `eslint-disable`, `# type: ignore`. Report the count per KLOC with `file:line` examples; any one in an auth or payment path is a finding of its own.
 
 ### 9. Scorecard
 Fill in the scorecard from **Appendix B**.
@@ -241,6 +242,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 - **Error messages describe the fix**, e.g. "Use `logger.track()` from `lib/telemetry`, not `console.log`". The agent reads the message and fixes it itself.
 - **Existing violations** go into a baseline, so the rule only blocks new ones.
 - **Exceptions** live on the offending line itself, with a reason.
+- **A typical first ratchet:** swallowed errors from the audit. Baseline today's count and block new ones; the message says to handle the error or let it crash loudly.
 - **Module boundaries** are enforced with a dependency check: import only through a module's entry point, and no cycles.
 - Optional: a table "rule → what enforces it" in `CODING_STANDARDS.md`. Remove a rule once its mistake has become impossible.
 
