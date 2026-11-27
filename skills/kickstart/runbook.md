@@ -1,7 +1,6 @@
 # Kickstart runbook (full procedure)
 
-> Loaded by the `/kickstart` skill. See SKILL.md for routing per argument.
-> A synthesis of practices from Matt Pocock, Dex Horthy, Lauren Tan, Kieran Klaassen, Simon Willison, Kent Beck, Addy Osmani and Anthropic's Claude Code docs (as of Nov 2026). See the README for credits and links.
+> Loaded by the `/kickstart` skill; SKILL.md routes each argument to sections here. Sources and credits: README.
 
 ---
 
@@ -14,22 +13,12 @@
    - Running tests, builds and local start-up is fine. Leave the ignored caches they create, and delete nothing.
 3. **Derive commands from the repo**: package.json, pyproject, Makefile, CI config, README. Never assume tools that aren't there.
 4. **Propose configuration, never apply it silently.** This covers hooks, permissions, CI and lint rules. Show the exact diff first and apply only after approval.
-5. **Prove every new check works:**
-   - it passes on the current code;
-   - add a temporary violation, and it fails;
-   - revert the violation, and it passes again.
-
-   A check that never fails is not a check.
+5. **Prove every new check works:** it passes on the current code, fails on a temporary violation, and passes again after the revert. A check that never fails is not a check.
 6. **One action item per session and per PR.** Update the status in `docs/agents/kickstart-status.md`: checkboxes plus the date and commit hash you worked on.
 7. **Facts before opinions.** First describe how something works *now*, with `file:line` references. Advice belongs in the report.
-8. **Invent nothing.**
-   - If you can't find something, write "not found".
-   - If you can't verify something, mark it `(unverified)`.
-9. **Secrets:**
-   - Never open `.env` or key files, and never print their values.
-   - Only check whether the file exists, whether it is in `.gitignore`, and whether it appears in git history (`git log -- <file>`).
-   - In reports, mention at most a prefix.
-10. **Skills and plugins are optional.** Use them if they are available in this environment, for example a brainstorm/grill, TDD, code-review or security-review skill. The runbook must also work without them.
+8. **Invent nothing.** Write "not found" for what you can't find, and mark what you can't verify `(unverified)`.
+9. **Secrets:** never open `.env` or key files, and never print their values. Only check whether the file exists, is in `.gitignore`, and appears in git history (`git log -- <file>`). Reports mention at most a prefix.
+10. **Skills and plugins are optional.** Use available ones, e.g. brainstorm/grill, TDD, code review, security review; the runbook also works without them.
 11. **Language:** write reports, notes and replies in the user's language. Keep code identifiers and established English terms (seam, blast radius, deep module) as they are.
 
 ---
@@ -61,10 +50,10 @@ Work in this order. Use subagents or parallel searches for broad searching, and 
 - **Start-up:** can the app start headless from an empty or seeded state?
 - **Driving:** can the app be driven via curl, a CLI, or browser automation such as Playwright or the Chrome DevTools Protocol?
 - **Evidence:** can logs, screenshots or traces be captured?
-- **Note what is missing.** According to Lauren Tan and Simon Willison this is the biggest lever: without this loop, the human is the verifier and therefore the bottleneck.
+- **Note what is missing.** This is the biggest lever: without this loop, the human is the verifier and the bottleneck.
 
 ### 4. Map of the codebase — task-blind
-- Describe how the system works **without** knowing which feature comes next. This follows Dex Horthy: a researcher who knows the task steers the facts toward the first solution that comes to mind.
+- Describe how the system works **without** knowing which feature comes next: a researcher who knows the task bends the facts toward its first idea.
 - Give an overview of folders and modules and what each is responsible for.
 - Trace **2–3 core flows** end to end, e.g. login, the main business action and payment. Use `file:line` references and a call-stack tree.
 - Collect **domain terms** as they appear in UI, code, DB and emails. Flag synonyms for the same concept, e.g. refund, reversal and chargeback. This seeds the glossary.
@@ -125,8 +114,8 @@ Cover at least these points:
 1. **What** are we building, **for whom**, and what is the smallest version that delivers value?
 2. **Core domain concepts.** This starts the glossary.
 3. **One-way doors:** auth, personal data, payments, data migrations, public APIs, emails to customers. Each of these later becomes an ADR.
-4. **Stack.** Default: the most strictly typed option the team knows, e.g. TypeScript strict, or Python with strict type checking. A strong type checker is the cheapest sensor.
-5. **Data and hosting.** Default: managed Postgres and push-to-deploy via CI/CD. Anything that can be deterministic should not be done by an agent.
+4. **Stack.** Default: the most strictly typed option the team knows (TypeScript strict, Python with strict type checking). A type checker is the cheapest sensor.
+5. **Data and hosting.** Default: managed Postgres and push-to-deploy via CI/CD. What can be deterministic is not done by an agent.
 6. **How will the agent verify a feature?** E.g. browser automation, API calls or a CLI. Decide this **before** the first feature.
 7. **Risk profile.** Personal software, customer software, or financial/medical? This later determines how much autonomy the agent gets.
 
@@ -138,14 +127,8 @@ Cover at least these points:
 
 1. Write `docs/agents/audit-YYYY-MM-DD.md` from the template in **Appendix C**.
 2. Build a **prioritised action list**.
-   - Use the default order below, and adjust it to what you found.
-   - This order is a **synthesis**: no single source prescribes one, but the sources converge on it.
-   - **Give every action item:**
-     - an ID (e.g. `F1`)
-     - what and why (which audit evidence)
-     - an estimated size (S/M/L)
-     - door (one-way / two-way) and blast radius
-     - which other ID it depends on (e.g. CI depends on a dependency manifest)
+   - Use the default order below, adjusted to what you found.
+   - **Every item gets** an ID (e.g. `F1`), what and why (audit evidence), a size (S/M/L), its door (one-way / two-way), blast radius, and the IDs it depends on (e.g. CI depends on a dependency manifest).
 
 | Order | Block | Why first |
 |---|---|---|
@@ -231,36 +214,13 @@ Run the tool once end to end. That is the proof this step is done.
   - check the schema against the current Claude Code docs.
   - On Windows, hooks run in Git Bash, or in PowerShell if Git Bash is missing. Set `"shell": "bash"` on a hook that needs bash, and test on the team's machines.
 
-  Example for illustration:
-  ```json
-  {
-    "permissions": {
-      "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"],
-      "ask": ["Bash(git push *)"]
-    },
-    "hooks": {
-      "Stop": [
-        { "hooks": [ { "type": "command", "command": "npm run typecheck 1>&2 || exit 2" } ] }
-      ]
-    }
-  }
-  ```
-  - **Stop hook with exit 2:** the agent cannot report "done" while the check fails.
-  - **Optional extra hooks:**
-    - a formatter after every edit (PostToolUse on `Edit|Write`);
-    - a block on edits to protected files: migrations, lockfiles, `.git/`.
+  - **For example:** `permissions.deny`: `Read(./.env)`, `Read(./.env.*)`, `Read(./secrets/**)`; `permissions.ask`: `Bash(git push *)`; a `hooks.Stop` command hook like `npm run typecheck 1>&2 || exit 2`, so the agent can't report "done" while the check fails.
+  - **Optional:** a formatter after every edit (PostToolUse on `Edit|Write`), and a block on edits to protected files (migrations, lockfiles, `.git/`).
 - **Branch protection on `main`** before any scheduled or cloud agents ever run.
 
 ### T — Language and knowledge
-- **`GLOSSARY.md`** in the root:
-  - start with the terms from the audit;
-  - per term a definition plus `_Avoid_:` with the synonyms not to use;
-  - no implementation details;
-  - grows **lazily**, during normal work.
-- **`docs/adr/NNNN-slug.md`:** one to three sentences. Write one only when the decision meets all three:
-  - hard to reverse;
-  - surprising without context;
-  - the result of a real trade-off.
+- **`GLOSSARY.md`** in the root: start with the audit's terms; per term a definition plus `_Avoid_:` with synonyms not to use; no implementation details; it grows **lazily** during normal work.
+- **`docs/adr/NNNN-slug.md`:** one to three sentences, only for a decision that is hard to reverse, surprising without context, *and* the result of a real trade-off.
 - **`docs/solutions/<category>/<slug>.md`** for lessons learned. Format in Appendix F.
   - Write one only when the work **corrected a wrong belief** and someone else would otherwise repeat the mistake.
   - Overlaps an existing lesson? Update that one instead of adding a new file.
@@ -337,69 +297,38 @@ How much autonomy fits depends on how much verification exists:
 
 ### For unfamiliar or large code (after Horthy)
 1. **Context 1 — questions.** Read the task and write 2–8 neutral questions of the form "how does X work?", never "how would we…". Copy links and paths over verbatim.
-2. **Context 2 — research.** A new context that **does not know the task** and gets only the questions. The result is a research document with:
-   - the commit hash in the frontmatter;
-   - headings that state the conclusion;
-   - `file:line` references;
-   - the existing test patterns per section;
-   - open questions.
-
-   If it's wrong, throw it away and run it again with more steering.
+2. **Context 2 — research.** A new context that **does not know the task** and gets only the questions. It writes a research document: commit hash in the frontmatter, headings that state the conclusion, `file:line` references, existing test patterns per section, open questions. If it's wrong, throw it away and rerun with more steering.
 3. **Design note** (~1 page, Appendix D).
    - Every design question starts *open*. The agent recommends, but only the human decides.
    - Show the **existing patterns that will be followed**, so the human can say "not that pattern".
 4. **Structure outline:** signatures, new types, a file-tree diff and phases.
    - Every phase is **vertical and verifiable on its own**.
-5. Implement one phase at a time:
-   - the checks run;
-   - the human checks;
-   - commit per phase.
-   - If reality differs from the plan, stop and report: "Expected / Found / Why it matters / How to proceed?"
+5. Implement one phase at a time: the checks run, the human checks, commit at the end of each phase. If reality differs from the plan, stop and report: "Expected / Found / Why it matters / How to proceed?"
 6. **The newest document wins:** plan > outline > design > research > ticket.
 
 ### Implementing
-- **TDD:** agree on the seams first. See the test **red** first, then green.
-  - No tautological tests.
-  - Mock only at system boundaries.
+- **TDD:** agree on the seams first; see the test **red**, then green. No tautological tests; mock only at system boundaries.
 - **Vertical slices:** the first slice touches schema, logic and a minimal visible UI or endpoint. Reject a first slice of "build the service first".
 - **Separate commits:** structural (refactor) and behavioural (feature/fix) changes go in separate commits.
 - **Commit only when** all tests pass and lint/typecheck are clean.
-- **Warning signs (Kent Beck)**, stop and steer when you see:
-  - loops;
-  - functionality nobody asked for;
-  - tests being disabled or deleted.
+- **Warning signs (Kent Beck):** stop and steer on loops, functionality nobody asked for, or tests being disabled or deleted.
 - **After two failed corrections:** new session, with the original prompt plus "not approach X".
 - **Have the agent test by hand on top of the unit tests:** run the app, curl, the browser. Every bug it finds that way first gets a red test.
 
 ### Context
 - **One task per session**, and clear between tasks (`/clear`). The reason is focus and cost. A fixed token limit is not a rule.
-- **Handoff to a next session:** write a short handoff or `progress.md` with:
-  - the goal;
-  - the approach;
-  - what has been done;
-  - the current problem;
-  - pointers to documents (don't copy them).
+- **Handoff to a next session:** write a short handoff or `progress.md` with the goal, the approach, what's done, the current problem, and pointers to documents (don't copy them).
 - **Effort:** *medium* by default. Higher for debugging unfamiliar code, flaky tests, schema changes, security and **verifying your own work**.
 
 ### After the work: capture lessons (compound)
 - **When:** only when the work corrected a wrong belief, or when the same correction was needed for the **second time**. Work that went as planned produces no lesson.
-- **Push the lesson as high as possible** on the ladder from block R:
-  1. one way to do it;
-  2. a check;
-  3. verification;
-  4. a rule in `CODING_STANDARDS.md`;
-  5. a lesson in `docs/solutions/`.
+- **Push the lesson as high as possible:** one way to do it, then a check, then verification, then a rule in `CODING_STANDARDS.md`; only if none fits, a lesson in `docs/solutions/`.
 - **One lesson at a time.**
 - **Specs and plans are archived or closed after delivery.** Stale specs mislead later agents.
 
 ### Your own craft
 - **Have the agent explain hard code** in a linear walkthrough. Have it quote the code via grep/sed rather than retyping it. That way you don't build up "cognitive debt".
-- **Read the classics:**
-  - *A Philosophy of Software Design* (Ousterhout)
-  - *Domain-Driven Design* (Evans)
-  - *Working Effectively with Legacy Code* (Feathers)
-  - *Refactoring* (Fowler)
-  - *Extreme Programming Explained* (Beck)
+- **Read the classics:** *A Philosophy of Software Design* (Ousterhout), *Domain-Driven Design* (Evans), *Working Effectively with Legacy Code* (Feathers), *Refactoring* (Fowler), *Extreme Programming Explained* (Beck).
 - **Code without AI now and then.**
 
 ---
