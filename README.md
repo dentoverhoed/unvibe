@@ -299,6 +299,7 @@ Tried it on your repo? We'd love to hear how it went.
 
 - **Issues:** the stack, what `/kickstart` did, and what you expected. A concrete repro is gold.
 - **PRs:** welcome for clear improvements. Please keep the runbook tight: every line costs the agent context.
+- **Changed the skill?** Rebuild the demo shop with `python examples/make_demo_shop.py ../demo-shop`, run the scenarios in [`evals/`](evals/README.md), and paste the results into your PR.
 
 If `/kickstart` saved you from a 2 a.m. "why is prod down", consider leaving a ⭐. It helps other people find it.
 
