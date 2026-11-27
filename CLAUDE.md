@@ -22,6 +22,8 @@ The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skil
 - Decisions already made, each with its reason and the rejected option: the "Decisions" table in `CONTRIBUTING.md`. Read it before proposing an alternative.
 
 ## Misleading spots
+- The tag ruleset blocks moving or deleting `v*` tags, but not creating them, and it has no bypass. To test the protection, use a tag that already exists; pushing a new tag just creates it, permanently. A wrong tag needs the user's OK to disable the ruleset briefly.
+- `gh release create --target` needs a full commit SHA. Or push the tag first, then use `--verify-tag`.
 - The README demo mentions `docs/agents/audit-2026-11-27.md`. That file belongs to the demo shop, not to this repo.
 - `docs/agents/` here is gitignored: it holds local `/kickstart` reports about unvibe itself.
 - The commit hashes in `docs/example-report.md` (`c3be5fc`, …) differ from the fixture's (`b43e17d`, …). This is on purpose, as `evals/README.md` explains.
