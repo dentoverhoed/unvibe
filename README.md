@@ -136,9 +136,9 @@ Every item gets an ID, an estimated size, its **door** (two-way = easy to undo, 
 | **F** | Foundation | One command each for test, typecheck, lint; CI that fails on errors | *Characterisation tests for checkout and refunds* |
 | **V** | Verification | The agent can **launch, drive and screenshot** your app itself | *A `verify` script: start → click through checkout → save evidence* |
 | **H** | Harness | The agent **can't say "done"** while checks fail | *Stop hook running typecheck; deny rule on `.env`* |
-| **T** | Language | One word per concept, decisions written down | *`GLOSSARY.md`: refund ✔ · reversal ✘ · chargeback ✘* |
+| **T** | Language and knowledge | One word per concept, decisions written down | *`GLOSSARY.md`: refund ✔ · reversal ✘ · chargeback ✘* |
 | **R** | Ratchet checks | Mistakes that happened twice become impossible | *Lint rule whose error message tells the agent the fix* |
-| **Re** | Review | A fresh, read-only reviewer plus an always-on security pass | *`reviewer` agent and a PR template with evidence* |
+| **Re** | Review setup | A fresh, read-only reviewer plus an always-on security pass | *`reviewer` agent and a PR template with evidence* |
 | **A** | Architecture | Big, testable modules instead of scattered logic | *Merge the two copies of the discount rule into one module* |
 | **Au** | Autonomy | Scheduled jobs, auto-merge | ***Only if you explicitly decide so. Never a default.*** |
 

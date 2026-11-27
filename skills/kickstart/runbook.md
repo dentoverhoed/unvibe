@@ -153,7 +153,7 @@ Cover at least these points:
 | F | **Foundation**: tests run, single-file test, typecheck, lint, CI | Without this loop every later step is guesswork |
 | V | **Verification**: the agent can start the app, drive it and show evidence | Stops the human from being the bottleneck |
 | H | **Harness**: lean CLAUDE.md, hooks, deny rules, protected files | Enforce at harness level, not through prompts |
-| T | **Language and map**: GLOSSARY.md, ADRs, knowledge store, coding standards | Shared language: fewer misunderstandings and better navigation |
+| T | **Language and knowledge**: GLOSSARY.md, ADRs, knowledge store, coding standards | Shared language: fewer misunderstandings and better navigation |
 | R | **Ratchet checks**: mechanical mistakes become checks that only block new violations | A mistake that happened twice does not come back |
 | Re | **Review setup**: fresh read-only reviewer, security axis, PR template | Catch mistakes before merge |
 | A | **Architecture**: hotspots become candidates, and you deepen one module at a time | Only worthwhile once F and V are in place |
@@ -176,6 +176,18 @@ General procedure for each action item:
 4. Prove that it works.
 5. PR using the template in Appendix E.
 6. Update the status.
+
+### S — Security-urgent
+Do these before any other block.
+- **Leaked secret:**
+  - confirm it is tracked with `git ls-files <file>`, without opening it;
+  - ask the user to rotate it at the provider. ⛔ **STOP** until they confirm. You never see or print the value;
+  - stop tracking the file (`git rm --cached <file>`) and add it to `.gitignore`;
+  - propose, as a diff, a deny rule in `.claude/settings.json`: `"permissions": { "deny": ["Read(./.env)", "Read(./.env.*)"] }`.
+  - Removing it from git history is a one-way door: propose it as a separate decision, never in the same PR.
+- **Open debug or admin endpoint:** remove it or put it behind authorization. Add a test proving an unauthenticated call is refused.
+- **Missing authorization:** check per action (owner or role), not only per route. Test with another user's resource: it must be refused (red → green).
+- **Evidence in the PR:** the test that failed and now passes. For a leaked secret: the user's confirmation of the rotation (never the value), `git ls-files <file>` now empty, and `git check-ignore <file>` matching.
 
 ### F — Foundation
 - **One command per action:** test, single test file, typecheck, lint, build. Record them in package scripts or a Makefile.
