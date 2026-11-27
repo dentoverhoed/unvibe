@@ -73,6 +73,20 @@ with tempfile.TemporaryDirectory() as tmp:
         (DEST / ".unvibe-install.json").unlink()
         (DEST / "runbook.md").write_bytes(git("show", f"{ROOT_COMMIT}:skills/kickstart/runbook.md") + b"hand edit\n")
         run("7 legacy cp-install with a hand edit", expect=2)
+
+        # --dest: another agent's skills folder
+        other = PROJ / "other-agent-skills"
+        out = subprocess.run([sys.executable, "-I", "scripts/install.py", "--dest", str(other)],
+                             cwd=REPO, capture_output=True, text=True)
+        same = out.returncode == 0 and all((other / "kickstart" / p.name).is_file()
+                                           and (other / "kickstart" / p.name).read_bytes() == p.read_bytes()
+                                           for p in SKILL.iterdir())
+        results.append(same)
+        print(f"{'OK ' if same else 'BAD'} 8 --dest installs into DIR/kickstart: exit={out.returncode}, identical={same}")
+        both = subprocess.run([sys.executable, "-I", "scripts/install.py", "--dest", str(other), "--project", str(PROJ)],
+                              cwd=REPO, capture_output=True, text=True)
+        results.append(both.returncode == 2)
+        print(f"{'OK ' if both.returncode == 2 else 'BAD'} 9 --dest with --project is refused: exit={both.returncode}")
     finally:
         git("checkout", "-q", "--", "skills/kickstart/")
 
