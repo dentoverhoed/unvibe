@@ -2,6 +2,7 @@
 
     python scripts/install.py                  # into ~/.claude/skills/kickstart
     python scripts/install.py --project DIR    # into DIR/.claude/skills/kickstart
+    python scripts/install.py --dest DIR       # into DIR/kickstart (another agent's skills folder)
     python scripts/install.py --check          # report only: exit 1 if out of date
     python scripts/install.py --force          # overwrite a copy that was edited by hand
 
@@ -57,13 +58,18 @@ def committed_versions(rel):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--project", metavar="DIR", help="install into DIR/.claude/skills/ instead of ~/.claude/skills/")
+    where = parser.add_mutually_exclusive_group()
+    where.add_argument("--project", metavar="DIR", help="install into DIR/.claude/skills/ instead of ~/.claude/skills/")
+    where.add_argument("--dest", metavar="DIR", help="install into DIR/kickstart, for an agent that reads skills from DIR")
     parser.add_argument("--check", action="store_true", help="only report, never write")
     parser.add_argument("--force", action="store_true", help="overwrite files edited by hand")
     args = parser.parse_args()
 
-    base = Path(args.project).resolve() if args.project else Path.home()
-    dest = base / ".claude" / "skills" / SRC.name
+    if args.dest:
+        dest = Path(args.dest).resolve() / SRC.name
+    else:
+        base = Path(args.project).resolve() if args.project else Path.home()
+        dest = base / ".claude" / "skills" / SRC.name
     src_files, dest_files = hashes(SRC), hashes(dest)
     if not src_files:
         print(f"error: no skill files found in {SRC}", file=sys.stderr)

@@ -237,7 +237,7 @@ Two-way door with a small blast radius? Skim it. One-way door? Read it slowly.
 
 ## Install (1 minute)
 
-Works with any agent that supports `SKILL.md` skills, such as [Claude Code](https://code.claude.com).
+Built and tested with [Claude Code](https://code.claude.com). Other agents that load `SKILL.md` skills can use it too: see **Another agent?** below. The hook recipes in the runbook are Claude Code-specific.
 
 ```bash
 git clone https://github.com/dentoverhoed/unvibe.git
@@ -249,7 +249,8 @@ This installs into `~/.claude/skills/kickstart` on macOS, Linux and Windows. Use
 - **Update:** `git -C unvibe pull && python unvibe/scripts/install.py`. The script lists what changes. If you edited the installed copy by hand, it refuses to overwrite your edits unless you add `--force`.
 - **Out of date?** Run `python unvibe/scripts/install.py --check`.
 - **Just one project?** Run `python unvibe/scripts/install.py --project path/to/your-repo`.
-- **No Python?** Copy `skills/kickstart` into `~/.claude/skills/` by hand.
+- **Another agent?** Run `python unvibe/scripts/install.py --dest path/to/its/skills`. This creates a `kickstart` folder there.
+- **No Python?** Copy `skills/kickstart` by hand into `~/.claude/skills/`, or into the other agent's skills folder.
 
 Then open any repo in a new session and type **`/kickstart`**.
 
