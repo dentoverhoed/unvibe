@@ -1,0 +1,116 @@
+"""Regression tests for scripts/check_skill.py: every rule must still bite.
+
+    python scripts/test_check_skill.py
+
+Copies the tracked files into a temporary git repo, plants one violation at a
+time, and requires check_skill.py to FAIL with the expected message. It also
+requires a PASS on the clean copy and on a harmless change, so a rule can't
+start firing on everything either. The real working tree is never touched.
+"""
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+SKILL, RUNBOOK, README = "skills/kickstart/SKILL.md", "skills/kickstart/runbook.md", "README.md"
+
+
+def replace(old, new, count=1):
+    def apply(root, rel):
+        p = root / rel
+        text = p.read_text(encoding="utf-8")
+        if old not in text:
+            raise AssertionError(f"test setup: {old!r} not found in {rel}")
+        p.write_text(text.replace(old, new, count), encoding="utf-8", newline="\n")
+    return apply
+
+
+def one_word_over_budget(root, rel):
+    """Grow the file to exactly budget + 1 words, whatever the budget is now."""
+    import ast
+    import re
+    budgets = re.search(r"WORD_BUDGET = (\{.*?\})", (root / "scripts/check_skill.py").read_text(encoding="utf-8"))
+    budget = ast.literal_eval(budgets.group(1))[Path(rel).name]
+    p = root / rel
+    text = p.read_text(encoding="utf-8")
+    p.write_text(text + "\n" + " ".join(["word"] * (budget + 1 - len(text.split()))) + "\n",
+                 encoding="utf-8", newline="\n")
+
+
+def append(extra):
+    def apply(root, rel):
+        p = root / rel
+        p.write_text(p.read_text(encoding="utf-8") + extra, encoding="utf-8", newline="\n")
+    return apply
+
+
+# (name, file, mutation, expected substring in output, or None for PASS)
+CASES = [
+    ("clean copy", None, None, None),
+    ("description wording", SKILL, replace("description: Use when", "description: Triggers when"),
+     "description must start with 'Use when'"),
+    ("name != folder", SKILL, replace("name: kickstart", "name: kick-start"), "!= folder 'kickstart'"),
+    ("description too long", SKILL, replace("description: Use when", "description: Use when " + "x" * 1100),
+     "(max 1024)"),
+    ("no frontmatter", SKILL, replace("---\nname:", "name:"), "no YAML frontmatter"),
+    ("routed heading renamed", RUNBOOK, replace("## Phase 1B —", "## Phase 1-new —"),
+     'routes to "Phase 1B"'),
+    ("routed appendix renamed", RUNBOOK, replace("## Appendix D —", "## Annex D —"), "Appendix D, but"),
+    ("block without Phase 3 section", RUNBOOK, replace("### S — Security-urgent", "### Security-urgent"),
+     "block S: no '### S — ' section"),
+    ("Phase 3 name differs", RUNBOOK, replace("### H — Harness", "### H — Agent harness"),
+     "Phase 2 'Harness' != Phase 3 'Agent harness'"),
+    ("README name differs", README, replace("| **H** | Harness |", "| **H** | Harnesses |"),
+     "!= README 'Harnesses'"),
+    ("broken relative link", README, replace("(docs/example-report.md)", "(docs/example-reprot.md)"),
+     "broken link -> docs/example-reprot.md"),
+    ("link inside code block is ignored", README, append("\n```\n[x](does-not-exist.md)\n```\n"), None),
+    ("runbook one word over budget", RUNBOOK, one_word_over_budget, "over its budget"),
+    ("SKILL.md one word over budget", SKILL, one_word_over_budget, "over its budget"),
+]
+
+
+def make_copy(dest):
+    files = subprocess.run(["git", "ls-files"], cwd=REPO, capture_output=True, text=True,
+                           check=True).stdout.splitlines()
+    for rel in files:
+        target = dest / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(REPO / rel, target)
+    for args in (["init", "-q"], ["add", "-A"]):
+        subprocess.run(["git", *args], cwd=dest, check=True, capture_output=True)
+
+
+def main():
+    failures = 0
+    with tempfile.TemporaryDirectory() as tmp:
+        pristine = Path(tmp) / "pristine"
+        make_copy(pristine)
+        for i, (name, rel, mutate, expected) in enumerate(CASES):
+            # A fresh folder per case: git marks its objects read-only on
+            # Windows, and TemporaryDirectory cleans those up at the end.
+            work = Path(tmp) / f"case{i}"
+            shutil.copytree(pristine, work)
+            if mutate:
+                mutate(work, rel)
+            out = subprocess.run([sys.executable, "-I", "scripts/check_skill.py"], cwd=work,
+                                 capture_output=True, text=True)
+            text = out.stdout + out.stderr
+            if expected is None:
+                ok = out.returncode == 0
+                want = "PASS"
+            else:
+                ok = out.returncode == 1 and expected in text
+                want = f"FAIL with {expected!r}"
+            failures += not ok
+            print(f"{'OK ' if ok else 'BAD'} {name}: exit={out.returncode}, expected {want}")
+            if not ok:
+                print("    " + "\n    ".join(text.strip().splitlines()))
+    print(f"\n{len(CASES) - failures}/{len(CASES)} passed")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
