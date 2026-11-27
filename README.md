@@ -274,7 +274,7 @@ Any. It derives commands from your repo (package.json, pyproject, Makefile, CI) 
 The procedure lives in the skill folder and is only loaded when you run `/kickstart`. Your normal sessions don't pay for it. An audit is one session.
 
 **What's the catch?**
-The security scan is a smoke test, not a pentest. Hooks target Claude Code's format, and other agents need their own equivalent. On Windows, Claude Code hooks run through Git Bash, so test them on your machines.
+The security scan is a smoke test, not a pentest. Hooks target Claude Code's format, and other agents need their own equivalent. On Windows, Claude Code runs hooks in Git Bash, or in PowerShell if Git Bash is missing, so test them on your machines.
 
 ## Standing on the shoulders of giants
 
