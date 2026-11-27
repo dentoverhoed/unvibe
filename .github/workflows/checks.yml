@@ -17,6 +17,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python scripts/check_skill.py
+      - run: python scripts/test_check_skill.py  # every rule above must still bite
 
   install:
     # Install, update, hand-edit protection and legacy copies, on every OS.
