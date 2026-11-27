@@ -1,0 +1,14 @@
+# Keep the GitHub Actions in .github/workflows/ up to date.
+# Dependabot opens one grouped PR a week; it must pass the required checks like any other PR.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
