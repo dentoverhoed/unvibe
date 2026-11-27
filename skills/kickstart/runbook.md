@@ -268,12 +268,12 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 3. Make one module **deeper**: a small interface with a lot of behaviour behind it.
    - Optionally design the interface twice, from different starting points, and compare.
    - Write tests against the interface.
-   - **Replace** the old shallow tests; don't stack new ones on top.
+   - **Replace** the old shallow tests, never locked characterisation tests; don't stack new ones on top.
    - **Splitting a god file:**
-     1. characterisation tests through the outer interface, locked so the agent can't edit them (hook or CODEOWNERS);
-     2. the human approves the cut plan: which module owns what. Split into modules, not helpers inside the same file;
+     1. the design note holds the cut plan: which module owns what. Split into modules, not helpers inside the same file. The human approves it at the design-note ⛔ STOP;
+     2. before any split: characterisation tests through the outer interface, proven to fail when the logic breaks, then locked so the agent can't edit them (propose the hook or CODEOWNERS as a diff);
      3. one seam per step, checks green after each, no locked test changed;
-     4. evidence: the input tokens a fresh agent needs for one fixed change, before and after.
+     4. evidence: the input tokens a fresh agent needs for one fixed change, before and after (the session's count, or characters ÷ 4).
 4. Repeat periodically. Running this automatically every day only belongs in block Au.
 
 ### Au — Autonomy (only by human decision)
