@@ -289,6 +289,7 @@ The security scan is a smoke test, not a pentest. Hooks target Claude Code's for
 | Separate structural and behavioural commits; warning signs | Kent Beck: "Augmented Coding: Beyond the Vibes" |
 | Small commits as save points | Addy Osmani: [My LLM coding workflow going into 2026](https://addyosmani.com/blog/ai-coding-workflow/) |
 | Lean CLAUDE.md, hooks over emphasis, read-only reviewers | Anthropic: [Claude Code best practices](https://code.claude.com/docs/en/best-practices) |
+| Swallowed errors as an audit signal and first ratchet | Armin Ronacher: ["Agentic Coding Recommendations"](https://lucumr.pocoo.org/2025/6/12/agentic-coding/); Liu et al.: ["Debt Behind the AI Boom"](https://arxiv.org/abs/2603.28592) |
 | Error messages as "positive prompt injection" | Birgitta Böckeler: [Harness engineering](https://martinfowler.com/articles/harness-engineering.html) |
 
 ## Contributing
