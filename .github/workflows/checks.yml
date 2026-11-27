@@ -18,6 +18,22 @@ jobs:
           python-version: "3.12"
       - run: python scripts/check_skill.py
 
+  install:
+    # Install, update, hand-edit protection and legacy copies, on every OS.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # install.py recognises older committed versions
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/test_install.py
+
   fixture:
     # The demo shop must build identically on every OS (same HEAD hash).
     strategy:
