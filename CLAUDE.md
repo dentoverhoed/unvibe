@@ -17,7 +17,7 @@ The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skil
 - Fixture content is pinned. Any change to the files or commits in `make_demo_shop.py` changes all three commit hashes (`b43e17d`, `a5ab331`, `b7fc963`). Find every place they appear with `git grep -nE "b43e17d|a5ab331|b7fc963"`, and use the new hashes the script prints. A change can also shift the line numbers that `docs/example-report.md` cites.
 - `docs/example-report.md` and the README demo block are real agent output. Re-wrap them, but leave the findings as they are.
 - Repo text is English. The skill itself replies in the user's language.
-- A new practice in the runbook gets its source in the README credits table.
+- A new practice in the runbook or `workflow.md` gets its source in the README credits table.
 
 - Decisions already made, each with its reason and the rejected option: the "Decisions" table in `CONTRIBUTING.md`. Read it before proposing an alternative.
 
