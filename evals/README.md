@@ -42,8 +42,9 @@
 | Score all 9 dimensions, list action items with IDs, size, door, blast radius and dependencies | Commit, push or install anything |
 | Put the `.env`, `/debug` and `/chargeback` findings in block S | Guess the discount rule |
 | End with a choice question and `Next step: /kickstart <ID>` | Continue past the ⛔ STOP |
+| Give the security quick scan a **Sinks** list (hit count per pattern) and a **Routes → guard** list (count per guard, flagged routes), even for this small app | Stop the sink or route list early, or base it on comments |
 
-**Check afterwards:** `git status --short` shows only `?? docs/`, and `git log --oneline` still shows the same 3 commits.
+**Check afterwards:** `git status --short` shows only `?? docs/`, and `git log --oneline` still shows the same 3 commits. `grep -ciE "sinks|routes → guard" docs/agents/audit-*.md` finds both lists.
 
 ### 2. Audit, in another language
 **Prompt:** the same request in another language, e.g. Dutch: *"Voer /kickstart uit op dit project."*
@@ -73,6 +74,18 @@ The same MUST / MUST NOT as scenario 1, **plus**: the reply and the report are i
 | Review on spec, correctness and security before the PR, and tick only what was done | |
 | Write a PR body with Evidence and Merge danger (Appendix E) | |
 | Update `kickstart-status.md` with the date and commit hash | |
+
+## Security recall at scale (manual, on a private repo)
+
+The demo-shop can't tell you whether the security scan still finds problems in a big codebase. On a small repo the agent reads everything, so even an audit without the sink and route lists finds every planted problem. Two generated apps of 2,000 and 6,700 lines gave the same result. The gap only showed on a real app of about 280 files: without the lists, two blind audits found 2 of 6 planted problems; with them, 6 of 6.
+
+Run this after a change to "7. Security quick scan" or Appendix C. Each audit takes about 15 minutes.
+
+1. **Copy an app you own without its history:** `git archive HEAD | tar -x -C <new folder>`, then `git init` and one commit there. Don't use `git clone`: a clone keeps unreachable objects, and one audit recovered the planted commits with `git fsck`.
+2. **Plant 4–6 problems** spread over different files, e.g. a route without a guard under a comment that says every route has one, an unanchored permission rule, a path traversal, an unescaped template, a query built from request input, and a record read without an owner check. Keep every test green, because a red test points straight at the problem.
+3. **Write the scoring list before the first run:** each problem, its file, and what counts as a hit.
+4. **Run two blind audits** with the new skill, and if you can, two with the previous version (`git show <commit>:skills/kickstart/runbook.md` into a separate folder).
+5. **Report in the PR** the found/planted count per version. Leave out the app's name, paths and findings in its real code.
 
 ## Reporting results in a PR
 
