@@ -15,6 +15,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 SKILL, RUNBOOK, README = "skills/kickstart/SKILL.md", "skills/kickstart/runbook.md", "README.md"
+WORKFLOW = "skills/kickstart/workflow.md"
 
 
 def replace(old, new, count=1):
@@ -57,6 +58,8 @@ CASES = [
     ("no frontmatter", SKILL, replace("---\nname:", "name:"), "no YAML frontmatter"),
     ("routed heading renamed", RUNBOOK, replace("## Phase 1B —", "## Phase 1-new —"),
      'routes to "Phase 1B"'),
+    ("routed file missing", SKILL, replace("all of `workflow.md`", "all of `workflows.md`"),
+     "SKILL.md names workflows.md, but"),
     ("routed appendix renamed", RUNBOOK, replace("## Appendix D —", "## Annex D —"), "Appendix D, but"),
     ("block without Phase 3 section", RUNBOOK, replace("### S — Security-urgent", "### Security-urgent"),
      "block S: no '### S — ' section"),
@@ -69,6 +72,7 @@ CASES = [
     ("link inside code block is ignored", README, append("\n```\n[x](does-not-exist.md)\n```\n"), None),
     ("runbook one word over budget", RUNBOOK, one_word_over_budget, "over its budget"),
     ("SKILL.md one word over budget", SKILL, one_word_over_budget, "over its budget"),
+    ("workflow.md one word over budget", WORKFLOW, one_word_over_budget, "over its budget"),
 ]
 
 

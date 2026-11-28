@@ -1,6 +1,6 @@
 # unvibe
 
-The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skills/kickstart/runbook.md`. Every line there costs context on every run, so prefer one precise sentence, or a check, over a paragraph.
+The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skills/kickstart/runbook.md`, and `/kickstart workflow` to `skills/kickstart/workflow.md`. Every line there costs context on every run, so prefer one precise sentence, or a check, over a paragraph.
 
 ## Commands
 - Checks: `python scripts/check_skill.py`. It covers frontmatter, routed headings, block names, relative links and a word budget for the skill. Changed a rule? `python scripts/test_check_skill.py` proves every rule still bites. CI also builds the fixture on Ubuntu, Windows and macOS.

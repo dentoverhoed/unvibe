@@ -5,7 +5,7 @@ description: Use when the user types /kickstart (optionally with an action ID li
 
 # /kickstart: project audit and setup for AI-assisted coding
 
-The full procedure is in `runbook.md`, in the same folder as this file. **Read only the sections the route below names.** Refer to sections by their heading, not by line number.
+The full procedure is in `runbook.md`, the daily workflow in `workflow.md`, both in the same folder as this file. **Read only the sections the route below names.** Refer to sections by their heading, not by line number.
 
 ## Choosing the route from the arguments
 
@@ -14,7 +14,7 @@ The full procedure is in `runbook.md`, in the same folder as this file. **Read o
 | *(none)* | **Phases 0–2**: detection, read-only audit or intake, report, then ⛔ STOP and ask which action items may be carried out | "Ground rules", "Phase 0", "Phase 1A" (existing) **or** "Phase 1B" (new), "Phase 2", Appendices A, B, C |
 | One or more action IDs, e.g. `F1`, `S1 V1` | **Phase 3** for that ID, **one ID per session** (if several: do the first and list the rest) | The ID's row in the action list of the latest `docs/agents/audit-*.md`; in `runbook.md`: "Ground rules", the intro of "Phase 3", the block matching the letter (S, F, V, H, T, R, Re, A, Au), Appendices A, D, E, F |
 | `status` | Summarise `docs/agents/kickstart-status.md`: what is done, which ID is next. Change nothing. | none |
-| `workflow` | Explain the daily workflow, applied to this project | "Phase 4" |
+| `workflow` | Explain the daily workflow, applied to this project | none; read all of `workflow.md` |
 | `again` | Run a new audit, then compare its scorecard with the previous `docs/agents/audit-*.md` | as for *(none)*, plus the previous audit |
 
 **Precondition for Phase 3:** `docs/agents/kickstart-status.md` exists, and a `docs/agents/audit-*.md` lists the ID.
