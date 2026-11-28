@@ -11,6 +11,8 @@
 4. Relative links in tracked Markdown files point to files that exist.
 5. Size budget: the skill is loaded into the agent's context on every run,
    so it may only grow when a PR raises WORD_BUDGET on purpose.
+6. Must-keep rules: the safety rules that trims have dropped before are
+   still there, and the runbook still has all its ground rules.
 """
 import re
 import subprocess
@@ -24,6 +26,18 @@ errors = []
 # Ratchet: just above the current size. Raise a number only in a PR that
 # explains why the extra words earn their context.
 WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 4110, "workflow.md": 640}
+
+# Rules a trim must not lose, as (phrase, minimum count) per file. Two trims
+# dropped rules that only a reviewer caught. Lower a count only in a PR that
+# explains why the rule may go.
+MUST_KEEP = {
+    "SKILL.md": [("⛔", 2), ("Phases 1 and 2 are read-only", 1), ("Configuration is proposed as a diff", 1),
+                 ("Prove every new check bites", 1), ("never open `.env`", 1), ("never print", 1)],
+    "runbook.md": [("⛔", 6), ("Phases 1 and 2 are read-only", 1), ("Propose configuration, never apply it silently", 1),
+                   ("Prove every new check works", 1), ("never open `.env`", 1), ("never print", 1),
+                   ("one-way door", 1), ("input validation at the edges", 1)],
+}
+GROUND_RULES = 11
 
 
 def read(path):
@@ -93,6 +107,21 @@ for name, budget in WORD_BUDGET.items():
         errors.append(f"{name} is {sizes[name]} words, over its budget of {budget}. "
                       f"Cut {sizes[name] - budget} words (shorter sentences, or a check instead of prose), "
                       f"or raise WORD_BUDGET in scripts/check_skill.py and say why in the PR")
+
+# 6. Must-keep rules
+for name, rules in MUST_KEEP.items():
+    text = read(SKILL_DIR / name)
+    for phrase, minimum in rules:
+        found = text.count(phrase)
+        if found < minimum:
+            shown = "STOP sign (U+26D4)" if phrase == "⛔" else phrase  # ASCII, so any console can print it
+            errors.append(f"{name} lost a must-keep rule: '{shown}' appears {found} times, needs {minimum}. "
+                          f"Restore it, or lower MUST_KEEP in scripts/check_skill.py and say why in the PR")
+ground = runbook.split("## Ground rules", 1)[1].split("\n---", 1)[0]
+numbered = re.findall(r"^(\d+)\. \*\*", ground, re.M)
+if len(numbered) < GROUND_RULES:
+    errors.append(f"runbook.md: 'Ground rules' has {len(numbered)} numbered rules, needs {GROUND_RULES}. "
+                  f"Restore the missing rule, or lower GROUND_RULES and say why in the PR")
 
 print(f"checked: frontmatter, {len(headings)} headings, blocks {', '.join(table)}, "
       f"links in {len(tracked)} files, size {sizes}")

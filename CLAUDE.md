@@ -3,7 +3,7 @@
 The product is a prompt: `skills/kickstart/SKILL.md` routes to sections of `skills/kickstart/runbook.md`, and `/kickstart workflow` to `skills/kickstart/workflow.md`. Every line there costs context on every run, so prefer one precise sentence, or a check, over a paragraph.
 
 ## Commands
-- Checks: `python scripts/check_skill.py`. It covers frontmatter, routed headings, block names, relative links and a word budget for the skill. Changed a rule? `python scripts/test_check_skill.py` proves every rule still bites. CI also builds the fixture on Ubuntu, Windows and macOS.
+- Checks: `python scripts/check_skill.py`. It covers frontmatter, routed headings, block names, relative links, a word budget for the skill, and must-keep rules (⛔ STOPs, secrets, config as a diff, …) that a trim may not drop. Changed a rule? `python scripts/test_check_skill.py` proves every rule still bites. CI also builds the fixture on Ubuntu, Windows and macOS.
 - Lint: `ruff check .` (rules in `ruff.toml`: real bugs, not style; install with `pip install -r requirements-dev.txt`).
 - Fixture: `python examples/make_demo_shop.py <folder outside this repo>`. It prints `HEAD: b7fc963 | self-test: 1 passed`.
 - Install: `python scripts/install.py`, or `--check` to see what's out of date. Tests: `python scripts/test_install.py`, which needs a clean `skills/kickstart/`.
