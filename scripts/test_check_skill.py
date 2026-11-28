@@ -73,6 +73,19 @@ CASES = [
     ("runbook one word over budget", RUNBOOK, one_word_over_budget, "over its budget"),
     ("SKILL.md one word over budget", SKILL, one_word_over_budget, "over its budget"),
     ("workflow.md one word over budget", WORKFLOW, one_word_over_budget, "over its budget"),
+    ("a STOP dropped from Phase 2", RUNBOOK, replace("⛔ **STOP.** Show a summary", "Show a summary"),
+     "'STOP sign (U+26D4)' appears 5 times, needs 6"),
+    ("secrets rule softened in the runbook", RUNBOOK, replace("never open `.env` or key files, and ", ""),
+     "lost a must-keep rule: 'never open `.env`'"),
+    ("secrets rule softened in SKILL.md", SKILL, replace("never open `.env` or key files, and never print values",
+                                                         "keep values private"),
+     "SKILL.md lost a must-keep rule: 'never open `.env`'"),
+    ("config-as-diff dropped", RUNBOOK, replace("Propose configuration, never apply it silently.", "Configure as needed."),
+     "'Propose configuration, never apply it silently'"),
+    ("validation dropped from the security scan", RUNBOOK, replace("input validation at the edges, ", ""),
+     "'input validation at the edges'"),
+    ("a ground rule removed", RUNBOOK, replace("10. **Skills and plugins are optional:**", "**Skills and plugins are optional:**"),
+     "has 10 numbered rules, needs 11"),
 ]
 
 
