@@ -63,6 +63,7 @@ Present and missing:
 
 - **In the repo:** CI and the steps it runs, pre-commit hooks, lint rules, module-boundary rules (dependency-cruiser, import-linter, ArchUnit-style tests).
 - **On the git host:** branch protection on `main`.
+- **Knowledge and review:** `GLOSSARY.md`, `docs/adr/`, `docs/solutions/` or similar, a PR template, `.claude/agents/`.
 - **Agent config:** `.claude/settings.json` (hooks, deny rules for `.env` and secrets); `CLAUDE.md` / `AGENTS.md` (size in lines, contents, stale or contradictory instructions); `.env` in `.gitignore`.
 
 ### 7. Security quick scan
@@ -263,19 +264,19 @@ Autonomy scales with verification:
 
 ## Appendix B — Scorecard (one point per criterion met, 0–3)
 
-A criterion you can't verify scores no point and is marked `(unverified)`. The evidence names each point.
+Per point, the evidence says `met`, `not met` (verifiably absent) or `(unverified)` (couldn't check); only `met` scores. Previous audit without per-criterion evidence? Compare criteria where its evidence allows; mark other dimensions `scale changed`, not a delta.
 
 | Dimension | Criteria | Score | Evidence |
 |---|---|---|---|
-| Tests | the test command runs; every test passes and one file runs on its own; tests reach the core flows through an outer interface (HTTP, CLI, public function) | | |
-| Types and lint | a type checker or linter runs; it is strict (strict mode, or errors not ignored); CI fails on new violations | | |
-| Agent verification | one command starts the app headless from an empty or seeded state; an agent can drive it without a human; logs, screenshots or responses land where an agent can read them | | |
+| Tests | the test command runs; every test passes and one file runs on its own; each core flow from step 4 has a test through the interface its users call (HTTP for a server, CLI for a tool, exported API for a library) | | |
+| Types and lint | a type checker or linter runs; the checker's strict mode is on (a linter alone: not met); CI fails on new violations | | |
+| Agent verification | one command (server, CLI or script) starts the app headless from an empty or seeded state; an agent can drive it without a human; evidence lands in a fixed folder (block V) | | |
 | Harness | CLAUDE.md / AGENTS.md exists and is under 200 lines; deny rules keep `.env` and key files out of reach; a hook runs the checks before the agent reports done | | |
-| Shared language | a glossary exists; hard-to-reverse decisions are recorded; lessons have a home with at least one entry | | |
-| Architecture | no source file over 1,000 lines; no import cycles; module boundaries are enforced by a check | | |
-| Review and PR | a PR template asks for evidence; a read-only reviewer or review policy with a security axis exists; changes reach `main` through PRs | | |
-| Security baseline | no secret in tracked files or git history; every route or action passes a guard (Routes → guard list); no sink hit reached by request input and no critical or high advisory | | |
-| CI/CD and branch protection | CI runs on every push or PR; CI runs the tests and fails on errors; `main` requires checks and refuses direct pushes | | |
+| Shared language | a glossary covers every synonym group from step 4; at least one decision record (`docs/adr/` or a decisions table); a lessons folder with at least one entry | | |
+| Architecture | no source file over 1,000 lines (generated and vendored excluded); a cycle check in the repo runs and reports none; module boundaries are enforced by a check | | |
+| Review and PR | a PR template asks for evidence; a reviewer agent without Edit/Write tools; its prompt or the review policy has a security axis | | |
+| Security baseline | no `.env` or key file is tracked and the step-7 secret search has no hit (rotated and untracked counts; no history rewrite needed); no route or action flagged in Routes → guard, and no sink hit reached by request input; no critical or high advisory (no dependencies: met; tool missing: unverified) | | |
+| CI/CD and branch protection | CI runs on every push or PR; CI runs the tests and fails on errors; `main` requires checks and refuses direct pushes, by protection or ruleset (no remote: not met) | | |
 
 ## Appendix C — `docs/agents/audit-YYYY-MM-DD.md`
 
@@ -283,7 +284,7 @@ A criterion you can't verify scores no point and is marked `(unverified)`. The e
 # Audit <project> — YYYY-MM-DD @ <commit>
 
 ## Summary (max 10 lines)
-## Scorecard
+## Scorecard (Appendix B criteria: met / not met / unverified per point)
 ## Commands (test / single test file / typecheck / lint / build / start)
 ## Codebase map
 - Modules and responsibilities
