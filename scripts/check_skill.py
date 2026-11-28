@@ -31,11 +31,17 @@ WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 4110, "workflow.md": 640}
 # dropped rules that only a reviewer caught. Lower a count only in a PR that
 # explains why the rule may go.
 MUST_KEEP = {
-    "SKILL.md": [("⛔", 2), ("Phases 1 and 2 are read-only", 1), ("Configuration is proposed as a diff", 1),
-                 ("Prove every new check bites", 1), ("never open `.env`", 1), ("never print", 1)],
-    "runbook.md": [("⛔", 6), ("Phases 1 and 2 are read-only", 1), ("Propose configuration, never apply it silently", 1),
-                   ("Prove every new check works", 1), ("never open `.env`", 1), ("never print", 1),
-                   ("one-way door", 1), ("input validation at the edges", 1)],
+    "SKILL.md": [("then ⛔ STOP and ask", 1), ("Every ⛔ STOP is a real stop", 1),
+                 ("Phases 1 and 2 are read-only", 1), ("You write only under `docs/agents/`", 1),
+                 ("Configuration is proposed as a diff", 1), ("Prove every new check bites", 1),
+                 ("never open `.env`", 1), ("never print", 1)],
+    "runbook.md": [("⛔ **STOP", 4), ("stop at every ⛔ STOP", 1), ("Phases 1 and 2 are read-only", 1),
+                   ("Change no code or config", 1),
+                   ("The only files you write are the report files under `docs/agents/`", 1),
+                   ("Propose configuration, never apply it silently", 1), ("Prove every new check works", 1),
+                   ("never open `.env`", 1), ("never print", 1),
+                   ("one-way door: propose it as a separate decision, never in the same PR", 1),
+                   ("input validation at the edges", 1)],
 }
 GROUND_RULES = 11
 
@@ -114,7 +120,7 @@ for name, rules in MUST_KEEP.items():
     for phrase, minimum in rules:
         found = text.count(phrase)
         if found < minimum:
-            shown = "STOP sign (U+26D4)" if phrase == "⛔" else phrase  # ASCII, so any console can print it
+            shown = phrase.replace("⛔", "STOP sign (U+26D4)")  # ASCII, so any console can print it
             errors.append(f"{name} lost a must-keep rule: '{shown}' appears {found} times, needs {minimum}. "
                           f"Restore it, or lower MUST_KEEP in scripts/check_skill.py and say why in the PR")
 ground = runbook.split("## Ground rules", 1)[1].split("\n---", 1)[0]
