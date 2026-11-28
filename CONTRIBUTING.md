@@ -27,7 +27,7 @@ The skill is two files: `skills/kickstart/SKILL.md` routes to sections of `skill
 ### Before you open a PR
 1. Run `python scripts/check_skill.py`. CI runs it too.
 2. Build the demo shop: `python examples/make_demo_shop.py ../demo-shop`.
-3. Run the [eval scenarios](evals/README.md) your change affects, at least scenario 1.
+3. Run the [eval scenarios](evals/README.md) your change affects, at least scenario 1. Changed the security quick scan? Also run the security recall check on a private repo ([evals/README.md](evals/README.md#security-recall-at-scale-manual-on-a-private-repo)).
 4. Using Claude Code? Ask the read-only `reviewer` agent in `.claude/agents/` to review your diff in a fresh context.
 5. Fill in the PR template, including the evals table. You must have read and tested your own PR before asking anyone else to.
 
