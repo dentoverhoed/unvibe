@@ -27,7 +27,7 @@ The full procedure is in `runbook.md`, the daily workflow in `workflow.md`, both
 - **Every ⛔ STOP is a real stop.** Your final answer is the question to the user.
 - **Configuration is proposed as a diff** and applied only after approval. This covers hooks, permissions, CI and lint rules.
 - **Prove every new check bites:** it passes, fails on a temporary violation, and passes again after the revert.
-- **Secrets:** never print values.
+- **Secrets:** never open `.env` or key files, and never print values.
 - **Every session:** update `docs/agents/kickstart-status.md` with the date and commit hash.
 - **Language:** reply and write reports in the user's language.
 
