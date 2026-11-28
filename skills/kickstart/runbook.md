@@ -18,16 +18,14 @@
 7. **Facts before opinions.** First describe how something works *now*, with `file:line` references. Advice belongs in the report.
 8. **Invent nothing.** Write "not found" for what you can't find, and mark what you can't verify `(unverified)`.
 9. **Secrets:** never open `.env` or key files, and never print their values. Only check whether the file exists, is in `.gitignore`, and appears in git history (`git log -- <file>`). Reports mention at most a prefix.
-10. **Skills and plugins are optional.** Use available ones, e.g. brainstorm/grill, TDD, code review, security review; the runbook also works without them.
+10. **Skills and plugins are optional:** use available ones (grill, TDD, code review, security review); the runbook works without them.
 11. **Language:** write reports, notes and replies in the user's language. Keep code identifiers and established English terms (seam, blast radius, deep module) as they are.
 
 ---
 
 ## Phase 0 — Detection and status (~5 min)
 
-1. Decide whether the project is **NEW** or **EXISTING**:
-   - **NEW**: an empty or nearly empty repo, or only a scaffold.
-   - **EXISTING**: anything else.
+1. Decide: **NEW** (an empty or nearly empty repo, or only a scaffold) or **EXISTING** (anything else).
 2. Create `docs/agents/kickstart-status.md` from the template in **Appendix A**.
 3. Go to **Phase 1A** (existing project) or **Phase 1B** (new project).
 
@@ -38,29 +36,22 @@
 Work in this order; use subagents or parallel searches for broad searching.
 
 ### 1. Run the tests first
-- Find the test command and run it. Note the number of tests, how many pass, the duration, and how to run **a single test file**.
-- No tests? Note that. It becomes priority 1 in the report.
+- Find and run the test command. Note the count, how many pass, the duration, and how to run **a single test file**.
+- No tests? That becomes priority 1 in the report.
 
 ### 2. Quick checks
-- Can you build, typecheck and lint? Note the commands and the results.
-- How strict is the typing (strict mode, count of `any` / `ignore`)?
-- Does CI fail on lint and type errors?
+Can you build, typecheck and lint (commands and results)? How strict is the typing (strict mode, count of `any` / `ignore`)? Does CI fail on lint and type errors?
 
 ### 3. Can an agent verify its own work?
-- **Start-up:** can the app start headless from an empty or seeded state?
-- **Driving:** can the app be driven via curl, a CLI, or browser automation such as Playwright or the Chrome DevTools Protocol?
-- **Evidence:** can logs, screenshots or traces be captured?
-- **Note what is missing.** This is the biggest lever: without this loop, the human is the verifier and the bottleneck.
+- **Start-up:** can the app start headless from an empty or seeded state? **Driving:** via curl, a CLI, or browser automation such as Playwright or the Chrome DevTools Protocol? **Evidence:** can logs, screenshots or traces be captured?
+- **Note what is missing.** This is the biggest lever: without it, the human is the verifier and the bottleneck.
 
 ### 4. Map of the codebase — task-blind
 - Describe how the system works **without** knowing which feature comes next: a researcher who knows the task bends the facts toward its first idea.
-- Give an overview of folders and modules and what each is responsible for.
-- Trace **2–3 core flows** end to end, e.g. login, the main business action and payment. Use `file:line` references and a call-stack tree.
+- Give an overview of folders and modules and what each owns.
+- Trace **2–3 core flows** end to end, e.g. login, the main business action and payment, with `file:line` references and a call-stack tree.
 - Collect **domain terms** as they appear in UI, code, DB and emails. Flag synonyms for the same concept, e.g. refund, reversal and chargeback. This seeds the glossary.
-- Note **misleading spots**:
-  - an old pattern that appears everywhere but must not be copied;
-  - a folder that looks dead but is live;
-  - "six ways to do the same thing".
+- Note **misleading spots**: an old pattern that appears everywhere but must not be copied, a folder that looks dead but is live, "six ways to do the same thing".
 
 ### 5. Hotspots
 - Run `git log` over the last ~3 months of activity, counted back from the latest commit. Rank files by **change count × complexity**: use the repo's complexity tool if it has one, otherwise line count and deepest indentation. The top of that list are the A candidates.
@@ -68,22 +59,21 @@ Work in this order; use subagents or parallel searches for broad searching.
 - Which commits are fixes or reverts, and which **kinds** of mistakes keep coming back?
 
 ### 6. Guardrail inventory
-Check what exists and what is missing:
+Present and missing:
 
 - **In the repo:** CI and the steps it runs, pre-commit hooks, lint rules, module-boundary rules (dependency-cruiser, import-linter, ArchUnit-style tests).
 - **On the git host:** branch protection on `main`.
 - **Agent config:** `.claude/settings.json` (hooks, deny rules for `.env` and secrets); `CLAUDE.md` / `AGENTS.md` (size in lines, contents, stale or contradictory instructions); `.env` in `.gitignore`.
 
 ### 7. Security quick scan
-Not a full audit. Check secrets in code or git history, input validation at the edges, authorization per action (not only per route), dependency advisories (`npm audit`, `pip-audit`, …), and debug or admin endpoints.
+Not a full audit, but two lists are complete even in a large repo, never sampled:
+- **Sinks:** grep the project's own source (not dependencies, build output, `.env` or key files) for the stack's sinks: raw HTML (`innerHTML`, `dangerouslySetInnerHTML`, `v-html`, `|safe`), queries or filters built from request input, shell exec, file paths from request input (`sendFile`, `download`, `readFile`, `path.join`), and fetching a user-supplied URL. Per hit: `file:line` and whether input reaches it.
+- **Routes → guard:** every route or action with the authentication and authorization (role or owner) it really passes, read from code, not comments. Flag unguarded routes or actions, rules that match more than intended (unanchored or wildcard patterns, a broad rule before narrow ones), and comments that promise a check the code lacks.
+
+Also check input validation at the edges, secrets in code or git history, dependency advisories (`npm audit`, `pip-audit`, …), and debug or admin endpoints.
 
 ### 8. Architecture signals
-- god files: large files with many responsibilities
-- duplicated code
-- shallow modules: many small files without a clear interface
-- import cycles
-- logic spread over many places, so one change needs many edits (low locality)
-- tests that restate the implementation instead of testing behaviour
+- God files (large, many responsibilities), duplicated code, shallow modules (many small files without a clear interface), import cycles, low locality (one change needs many edits), and tests that restate the implementation instead of testing behaviour.
 - **swallowed errors:** empty or broad `catch`/`except`, `except Exception: pass`, `|| true`, `@ts-ignore`, `eslint-disable`, `# type: ignore`. Report the count per KLOC with `file:line` examples; any one in an auth or payment path is a finding of its own.
 
 ### 9. Scorecard
@@ -95,9 +85,7 @@ Fill in the scorecard from **Appendix B**.
 
 ## Phase 1B — Intake for a NEW project
 
-Interview the user ("grilling"):
-- Ask **one question at a time**, each with **a recommended answer**, so that "yes" is enough.
-- Don't ask what you can look up yourself.
+Interview the user ("grilling"): **one question at a time**, each with **a recommended answer** so that "yes" is enough, and nothing you can look up yourself.
 
 Cover at least these points:
 
@@ -107,7 +95,7 @@ Cover at least these points:
 4. **Stack.** Default: the most strictly typed option the team knows (TypeScript strict, Python with strict type checking). A type checker is the cheapest sensor.
 5. **Data and hosting.** Default: managed Postgres and push-to-deploy via CI/CD. What can be deterministic is not done by an agent.
 6. **How will the agent verify a feature?** E.g. browser automation, API calls or a CLI. Decide this **before** the first feature.
-7. **Risk profile.** Personal software, customer software, or financial/medical? This later determines how much autonomy the agent gets.
+7. **Risk profile.** Personal software, customer software, or financial/medical? It later sets how much autonomy the agent gets.
 
 **→ Go to Phase 2.**
 
@@ -116,9 +104,7 @@ Cover at least these points:
 ## Phase 2 — Report and choice
 
 1. Write `docs/agents/audit-YYYY-MM-DD.md` from the template in **Appendix C**.
-2. Build a **prioritised action list**.
-   - Use the default order below, adjusted to what you found.
-   - **Every item gets** an ID (e.g. `F1`), what and why (audit evidence), a size (S/M/L), its door (one-way / two-way), blast radius, and the IDs it depends on (e.g. CI depends on a dependency manifest).
+2. Build a **prioritised action list** in the default order below, adjusted to what you found. **Every item gets** an ID (e.g. `F1`), what and why (audit evidence), a size (S/M/L), its door (one-way / two-way), blast radius, and the IDs it depends on (e.g. CI depends on a dependency manifest).
 
 | Order | Block | Why first |
 |---|---|---|
@@ -141,9 +127,7 @@ Cover at least these points:
 ## Phase 3 — Execute: one action item per session
 
 For each action item:
-1. New branch.
-   - If this ID depends on an open ID, say so and propose doing that one first.
-   - If files in `docs/agents/` are not yet committed, commit them first, as a separate commit on the branch.
+1. New branch. If this ID depends on an open ID, say so and propose that one first. Commit uncommitted `docs/agents/` files first, as a separate commit on the branch.
 2. Is the shape non-trivial? Then first write a **design note of ~1 page** (Appendix D). ⛔ **STOP**: the human reads that note, not a long plan.
 3. Carry it out in small steps.
 4. Prove that it works.
@@ -166,10 +150,7 @@ For each action item:
 - **One command per action:** test, single test file, typecheck, lint, build. Record them in package scripts or a Makefile.
 - **No tests? Start with characterisation tests:** tests that pin down the *current* behaviour of the core flows through the outermost interface (HTTP, CLI, public function). Don't test line by line.
 - **CI runs** typecheck, lint and tests, and fails on errors.
-- **Tighten typing with a ratchet:**
-  - turn strict mode on;
-  - record existing violations in a baseline;
-  - let CI fail only on **new** violations.
+- **Tighten typing with a ratchet:** turn strict mode on, record existing violations in a baseline, and let CI fail only on **new** violations.
 
 ### V — Verification (the biggest lever)
 Build a **verification tool** for the agent: a script, CLI or skill with these parts.
@@ -182,37 +163,28 @@ Build a **verification tool** for the agent: a script, CLI or skill with these p
 | **doctor** | read-only health check: is everything running, are the ports free? |
 | **cleanup** | stops only what the tool itself started, and keeps the evidence |
 
-Also create a **feature map**, e.g. `docs/agents/features/<feature>.md`:
-- per feature: sub-features, how a user gets there, how to drive it, gotchas;
-- start with 3–5 features.
+Also create a **feature map**, e.g. `docs/agents/features/<feature>.md`: per feature its sub-features, how a user gets there, how to drive it, and gotchas. Start with 3–5 features.
 
-Run the tool once end to end. That is the proof this step is done.
+Running the tool once end to end proves this step is done.
 
 ### H — Harness
-- **Keep CLAUDE.md lean.** Guideline: well under 200 lines, ideally around 60.
+- **Keep CLAUDE.md lean:** well under 200 lines, ideally around 60.
   - **In it:** commands, misleading spots, decisions that can't be read from the code, and rules that had to be corrected twice.
-  - **Not in it:** folder structure, architecture explanations, copies of scripts. The agent looks those up itself.
+  - **Not in it:** folder structure, architecture explanations, copies of scripts; the agent looks those up itself.
   - **Pointers** to everything else are descriptive, e.g. `docs/solutions/: solved problems by category, with YAML frontmatter`. Don't write "ALWAYS READ ...".
   - Only an `AGENTS.md` exists? Put `@AGENTS.md` in CLAUDE.md, or keep a single source.
   - Personal notes go in `CLAUDE.local.md`, which is gitignored.
-- **Phrase rules positively** ("use X"), not as prohibitions. Don't use CAPITALS or IMPORTANT. If a rule keeps being ignored, it belongs in a hook or a check.
-- **Propose hooks and permissions** in the project-level `.claude/settings.json`:
-  - derive the commands from the repo;
-  - show the diff;
-  - after applying, check with `/hooks`;
-  - check the schema against the current Claude Code docs.
-  - On Windows, hooks run in Git Bash, or in PowerShell if Git Bash is missing. Set `"shell": "bash"` on a hook that needs bash, and test on the team's machines.
+- **Phrase rules positively** ("use X"), not as prohibitions. Don't use CAPITALS or IMPORTANT; a rule that keeps being ignored belongs in a hook or a check.
+- **Propose hooks and permissions** in the project-level `.claude/settings.json`: derive the commands from the repo, show the diff, check with `/hooks` after applying, and check the schema against the current Claude Code docs. On Windows, hooks run in Git Bash, or in PowerShell if Git Bash is missing: set `"shell": "bash"` on a hook that needs bash, and test on the team's machines.
 
   - **For example:** `permissions.deny`: `Read(./.env)`, `Read(./.env.*)`, `Read(./secrets/**)`; `permissions.ask`: `Bash(git push *)`; a `hooks.Stop` command hook like `npm run typecheck 1>&2 || exit 2`, so the agent can't report "done" while the check fails.
   - **Edit-time blocks:** PreToolUse hooks that exit 2 on `Edit|Write` of protected files (migrations, lockfiles, `.git/`, locked tests) or new forbidden imports, and on `Bash` for `git commit --no-verify` (permission patterns are fragile for flags). Prove each with a violating and a clean stdin payload (exit 2, then 0). Bash writes bypass them; the Stop hook and CI stay the backstop. Optional: a formatter after every edit (PostToolUse).
-- **Branch protection on `main`** before any scheduled or cloud agents ever run.
+- **Branch protection on `main`** before any scheduled or cloud agents run.
 
 ### T — Language and knowledge
 - **`GLOSSARY.md`** in the root: start with the audit's terms; per term a definition plus `_Avoid_:` with synonyms not to use; no implementation details; it grows **lazily** during normal work.
 - **`docs/adr/NNNN-slug.md`:** one to three sentences, only for a decision that is hard to reverse, surprising without context, *and* the result of a real trade-off.
-- **`docs/solutions/<category>/<slug>.md`** for lessons learned. Format in Appendix F.
-  - Write one only when the work **corrected a wrong belief** and someone else would otherwise repeat the mistake.
-  - Overlaps an existing lesson? Update that one instead of adding a new file.
+- **`docs/solutions/<category>/<slug>.md`** for lessons learned (format in Appendix F), only when the work **corrected a wrong belief** that someone else would otherwise repeat. Overlaps an existing lesson? Update that one.
 - **`CODING_STANDARDS.md`:** judgement calls only. Anything mechanically checkable becomes a check.
 - **`REVIEW.md`:** the review policy. What does each severity mean, which paths are skipped, what evidence is required?
 
@@ -227,7 +199,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 5. Human review             → most expensive, last resort
 ```
 
-- **Error messages describe the fix**, e.g. "Use `logger.track()` from `lib/telemetry`, not `console.log`". The agent reads the message and fixes it itself.
+- **Error messages describe the fix**, e.g. "Use `logger.track()` from `lib/telemetry`, not `console.log`", so the agent can fix it itself.
 - **Existing violations** go into a baseline, so the rule only blocks new ones.
 - **Exceptions** live on the offending line itself, with a reason.
 - **A typical first ratchet:** swallowed errors from the audit. Baseline today's count and block new ones; the message says to handle the error or let it crash loudly.
@@ -235,9 +207,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 - Optional: a table "rule → what enforces it" in `CODING_STANDARDS.md`. Remove a rule once its mistake has become impossible.
 
 ### Re — Review setup
-- **Read-only reviewer agent**, e.g. `.claude/agents/reviewer.md` with `tools: Read, Grep, Glob`.
-  - Runs in a **fresh context**, and is never the agent that wrote the code.
-  - Gets the standards **pushed** into its prompt; the implementer has to look them up itself.
+- **Read-only reviewer agent**, e.g. `.claude/agents/reviewer.md` with `tools: Read, Grep, Glob`. It runs in a **fresh context**, is never the agent that wrote the code, and gets the standards **pushed** into its prompt; the implementer looks them up itself.
 - **Axes:**
   1. **Spec**: was what was asked for built?
   2. **Correctness and standards**, including what agents typically get wrong: does a type or compile fix change meaning? Does every new mechanism (cache, retry, layer) answer a stated requirement? Is dead code left behind? Are the assumptions written down?
@@ -247,11 +217,7 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
 - **The author reviews first.** Never open a PR with agent code or a PR description you haven't read and tested yourself.
 
 ### A — Architecture
-1. Turn the hotspots from the audit into **candidates**. For each candidate give:
-   - the problem in one sentence;
-   - the solution in one sentence;
-   - the win, in glossary terms;
-   - a strength: strong / worth exploring / speculative.
+1. Turn the hotspots from the audit into **candidates**, each with the problem and the solution in one sentence each, the win in glossary terms, and a strength (strong / worth exploring / speculative).
 2. ⛔ **STOP.** The user picks one candidate. A candidate rejected for a lasting reason gets an ADR, so it doesn't come back.
 3. Make one module **deeper**: a small interface with a lot of behaviour behind it.
    - Optionally design the interface twice, from different starting points, and compare.
@@ -262,19 +228,14 @@ Take every mistake that happened **twice** (in the audit, in reverts or in revie
      2. before any split: characterisation tests through the outer interface, proven to fail when the logic breaks, then locked so the agent can't edit them (propose the hook or CODEOWNERS as a diff);
      3. one seam per step, checks green after each, no locked test changed;
      4. evidence: the input tokens a fresh agent needs for one fixed change, before and after (the session's count, or characters ÷ 4).
-4. Repeat periodically. Running this automatically every day only belongs in block Au.
+4. Repeat periodically; running it daily and automatically belongs only in block Au.
 
 ### Au — Autonomy (only by human decision)
-How much autonomy fits depends on how much verification exists:
-- **Personal or internal tools:** sample autonomous PRs, e.g. every 5th. Review merges after the fact.
+Autonomy scales with verification:
+- **Personal or internal tools:** sample autonomous PRs (e.g. every 5th) and review merges after the fact.
 - **Customer, financial or medical software:** spend far more on verification and security. One-way doors always get human review.
 
-**Before any unattended run, answer five questions:**
-1. What does "done" mean?
-2. Can the agent check it itself?
-3. What may the agent touch?
-4. What stops the agent?
-5. Where does the result land, and who signs off?
+**Before any unattended run, answer five questions:** what does "done" mean, can the agent check it itself, what may it touch, what stops it, and where does the result land and who signs off?
 
 **Only by explicit human decision, never by default:** scheduled architecture PRs, auto-merge, integration branches with many parallel agents, and bypass/YOLO modes (those only in a throwaway container).
 
@@ -292,37 +253,34 @@ How much autonomy fits depends on how much verification exists:
 
 ### For unfamiliar or large code (after Horthy)
 1. **Context 1 — questions.** Read the task and write 2–8 neutral questions of the form "how does X work?", never "how would we…". Copy links and paths over verbatim.
-2. **Context 2 — research.** A new context that **does not know the task** and gets only the questions. It writes a research document: commit hash in the frontmatter, headings that state the conclusion, `file:line` references, existing test patterns per section, open questions. If it's wrong, throw it away and rerun with more steering.
-3. **Design note** (~1 page, Appendix D).
-   - Every design question starts *open*. The agent recommends, but only the human decides.
-   - Show the **existing patterns that will be followed**, so the human can say "not that pattern".
-4. **Structure outline:** signatures, new types, a file-tree diff and phases.
-   - Every phase is **vertical and verifiable on its own**.
+2. **Context 2 — research.** A new context that **does not know the task** and gets only the questions. It writes a research document: commit hash in the frontmatter, headings that state the conclusion, `file:line` references, existing test patterns per section, open questions. If it's wrong, discard it and rerun with more steering.
+3. **Design note** (~1 page, Appendix D). Every design question starts *open*: the agent recommends, only the human decides. Show the **existing patterns that will be followed**, so the human can say "not that pattern".
+4. **Structure outline:** signatures, new types, a file-tree diff and phases, each **vertical and verifiable on its own**.
 5. Implement one phase at a time: the checks run, the human checks, commit at the end of each phase. If reality differs from the plan, stop and report: "Expected / Found / Why it matters / How to proceed?"
 6. **The newest document wins:** plan > outline > design > research > ticket.
 
 ### Implementing
 - **TDD:** agree on the seams first; see the test **red**, then green. No tautological tests; mock only at system boundaries.
 - **Vertical slices:** the first slice touches schema, logic and a minimal visible UI or endpoint. Reject a first slice of "build the service first".
-- **Separate commits:** structural (refactor) and behavioural (feature/fix) changes go in separate commits.
+- **Separate commits** for structural (refactor) and behavioural (feature/fix) changes.
 - **Commit only when** all tests pass and lint/typecheck are clean.
 - **Warning signs (Kent Beck):** stop and steer on loops, functionality nobody asked for, or tests being disabled or deleted.
 - **After two failed corrections:** new session, with the original prompt plus "not approach X".
-- **Have the agent test by hand on top of the unit tests:** run the app, curl, the browser. Every bug it finds that way first gets a red test.
+- **The agent also tests by hand** (app, curl, browser); every bug found that way first gets a red test.
 
 ### Context
-- **One task per session**, and clear between tasks (`/clear`). The reason is focus and cost. A fixed token limit is not a rule.
-- **Handoff to a next session:** write a short handoff or `progress.md` with the goal, the approach, what's done, the current problem, and pointers to documents (don't copy them).
+- **One task per session**; clear between tasks (`/clear`) for focus and cost, not because of a fixed token limit.
+- **Handoff to a next session:** write a short handoff or `progress.md` with goal, approach, what's done, the current problem, and pointers to documents (not copies).
 - **Effort:** *medium* by default. Higher for debugging unfamiliar code, flaky tests, schema changes, security and **verifying your own work**.
 
 ### After the work: capture lessons (compound)
-- **When:** only when the work corrected a wrong belief, or when the same correction was needed for the **second time**. Work that went as planned produces no lesson.
+- **When:** only when the work corrected a wrong belief, or the same correction was needed a **second time**; work that went as planned produces none.
 - **Push the lesson as high as possible:** one way to do it, then a check, then verification, then a rule in `CODING_STANDARDS.md`; only if none fits, a lesson in `docs/solutions/`.
 - **One lesson at a time.**
-- **Specs and plans are archived or closed after delivery.** Stale specs mislead later agents.
+- **Archive or close specs and plans after delivery:** stale specs mislead later agents.
 
 ### Your own craft
-- **Have the agent explain hard code** in a linear walkthrough. Have it quote the code via grep/sed rather than retyping it. That way you don't build up "cognitive debt".
+- **Have the agent explain hard code** in a linear walkthrough, quoting the code via grep/sed rather than retyping it, so you don't build up "cognitive debt".
 - **Read the classics:** *A Philosophy of Software Design* (Ousterhout), *Domain-Driven Design* (Evans), *Working Effectively with Legacy Code* (Feathers), *Refactoring* (Fowler), *Extreme Programming Explained* (Beck).
 - **Code without AI now and then.**
 
@@ -378,6 +336,9 @@ How much autonomy fits depends on how much verification exists:
 ## Hotspots and recurring mistake types
 ## Guardrails: present / missing
 ## Security quick scan
+- Sinks: hit count per pattern; every hit reached by request input (file:line)
+- Routes → guard: count per guard; every flagged route
+- Validation, secrets, advisories, debug/admin endpoints
 ## Architecture signals
 ## Action list
 | ID | Block | What | Why (evidence) | Size | Door | Blast radius | Depends on |
