@@ -275,7 +275,7 @@ Per point, the evidence says `met`, `not met` (verifiably absent) or `(unverifie
 | Shared language | a glossary covers every synonym group from step 4; at least one decision record (`docs/adr/` or a decisions table); a lessons folder with at least one entry | | |
 | Architecture | no source file over 1,000 lines (generated and vendored excluded); a cycle check in the repo runs and reports none; module boundaries are enforced by a check | | |
 | Review and PR | a PR template asks for evidence; a reviewer agent without Edit/Write tools; its prompt or the review policy has a security axis | | |
-| Security baseline | no `.env` or key file is tracked and the step-7 secret search has no hit, placeholders included (rotated and untracked counts; no history rewrite needed); no route or action flagged in Routes → guard, and no sink hit reached by request input; no critical or high advisory (no dependencies: met; tool missing: unverified) | | |
+| Security baseline | no `.env` or key file is tracked and the step-7 secret search has no hit, placeholders included (rotated and untracked counts; no history rewrite needed); no route or action flagged in Routes → guard, and no sink hit reached by request input; no critical or high advisory (no dependency manifest: met; manifest but no audit tool: unverified) | | |
 | CI/CD and branch protection | CI runs on every push or PR; CI runs the tests and fails on errors; `main` requires checks and refuses direct pushes, by protection or ruleset (no remote: not met) | | |
 
 ## Appendix C — `docs/agents/audit-YYYY-MM-DD.md`
