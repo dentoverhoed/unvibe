@@ -23,7 +23,7 @@ errors = []
 
 # Ratchet: just above the current size. Raise a number only in a PR that
 # explains why the extra words earn their context.
-WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 3850, "workflow.md": 640}
+WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 3990, "workflow.md": 640}
 
 
 def read(path):

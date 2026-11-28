@@ -261,19 +261,21 @@ Autonomy scales with verification:
 - …
 ```
 
-## Appendix B — Scorecard (0 = absent … 3 = strong)
+## Appendix B — Scorecard (one point per criterion met, 0–3)
 
-| Dimension | 0 | 3 | Score | Evidence |
-|---|---|---|---|---|
-| Tests | none | fast, reliable, single-file runs possible, against interfaces | | |
-| Types and lint | none / loose | strict + CI fails + ratchet | | |
-| Agent verification | agent can't start the app | launch/drive/evidence tool + feature map | | |
-| Harness | no agent config | lean CLAUDE.md, hooks, deny rules | | |
-| Shared language | synonyms everywhere | glossary + ADRs + knowledge store | | |
-| Architecture | god files, cycles, duplication | deep modules, boundaries enforced | | |
-| Review and PR | none | fresh reviewer + security + PR evidence | | |
-| Security baseline | secrets exposed / no validation | secrets protected, validation, authz, advisories | | |
-| CI/CD and branch protection | manual | deterministic pipeline, main protected | | |
+A criterion you can't verify scores no point and is marked `(unverified)`. The evidence names each point.
+
+| Dimension | Criteria | Score | Evidence |
+|---|---|---|---|
+| Tests | the test command runs; every test passes and one file runs on its own; tests reach the core flows through an outer interface (HTTP, CLI, public function) | | |
+| Types and lint | a type checker or linter runs; it is strict (strict mode, or errors not ignored); CI fails on new violations | | |
+| Agent verification | one command starts the app headless from an empty or seeded state; an agent can drive it without a human; logs, screenshots or responses land where an agent can read them | | |
+| Harness | CLAUDE.md / AGENTS.md exists and is under 200 lines; deny rules keep `.env` and key files out of reach; a hook runs the checks before the agent reports done | | |
+| Shared language | a glossary exists; hard-to-reverse decisions are recorded; lessons have a home with at least one entry | | |
+| Architecture | no source file over 1,000 lines; no import cycles; module boundaries are enforced by a check | | |
+| Review and PR | a PR template asks for evidence; a read-only reviewer or review policy with a security axis exists; changes reach `main` through PRs | | |
+| Security baseline | no secret in tracked files or git history; every route or action passes a guard (Routes → guard list); no sink hit reached by request input and no critical or high advisory | | |
+| CI/CD and branch protection | CI runs on every push or PR; CI runs the tests and fails on errors; `main` requires checks and refuses direct pushes | | |
 
 ## Appendix C — `docs/agents/audit-YYYY-MM-DD.md`
 
