@@ -15,7 +15,7 @@ Before you paste output, remove secrets, customer data and internal URLs. `/kick
 
 ## 2. Improve the skill
 
-The skill is two files: `skills/kickstart/SKILL.md` routes to sections of `skills/kickstart/runbook.md`. Both are prompts, so every line costs the agent context on every run.
+The skill is three files: `skills/kickstart/SKILL.md` routes to sections of `skills/kickstart/runbook.md`, and `/kickstart workflow` to `skills/kickstart/workflow.md`. All three are prompts, so every line costs the agent context on every run.
 
 ### What makes a good change
 - **It fixes something an agent actually got wrong.** Show the run where it went wrong. "This would be nicer" is not enough.

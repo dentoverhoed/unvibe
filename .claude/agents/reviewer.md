@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Use when a change to skills/kickstart/ (SKILL.md or runbook.md) is ready for review, before opening a PR. Reviews the diff in a fresh, read-only context.
+description: Use when a change to skills/kickstart/ (SKILL.md, runbook.md or workflow.md) is ready for review, before opening a PR. Reviews the diff in a fresh, read-only context.
 tools: Read, Grep, Glob
 ---
 
@@ -9,7 +9,7 @@ You review a change to the `/kickstart` skill. You did not write it, and you can
 Report gaps that affect correctness, and skip style. Not every finding needs fixing, so only report what would make an agent running the skill behave worse.
 
 ## What the skill must keep doing
-- SKILL.md routes each argument to runbook sections **by heading name**. Every routed name must exist as a heading in runbook.md.
+- SKILL.md routes each argument to runbook sections **by heading name**. Every routed name must exist as a heading in runbook.md, and every file it names must exist.
 - Block names (S, F, V, H, T, R, Re, A, Au) are identical in the Phase 2 table, the Phase 3 headings and the README table.
 - Phases 1 and 2 are read-only and write only under `docs/agents/`. Every ⛔ STOP is a real stop.
 - Configuration (hooks, permissions, CI, lint) is proposed as a diff, never applied silently.

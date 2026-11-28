@@ -4,7 +4,8 @@
 
 1. SKILL.md frontmatter: name matches the folder, description <= 1024 chars
    and starts with "Use when".
-2. Every runbook section SKILL.md routes to exists ("Phase 1A", "Appendix D", ...).
+2. Every runbook section SKILL.md routes to exists ("Phase 1A", "Appendix D", ...),
+   and every file SKILL.md names (`workflow.md`, ...) is in the skill folder.
 3. Block names agree: Phase 2 table = Phase 3 heading = README table, and
    every block letter has its own Phase 3 section.
 4. Relative links in tracked Markdown files point to files that exist.
@@ -22,7 +23,7 @@ errors = []
 
 # Ratchet: just above the current size. Raise a number only in a PR that
 # explains why the extra words earn their context.
-WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 4450}
+WORD_BUDGET = {"SKILL.md": 520, "runbook.md": 3850, "workflow.md": 640}
 
 
 def read(path):
@@ -51,6 +52,9 @@ headings = re.findall(r"^#{2,3} (.+)$", runbook, re.M)
 for name in sorted(set(re.findall(r'"((?:Phase \w+|Ground rules)[^"]*)"', skill))):
     if not any(h.startswith(name) for h in headings):
         errors.append(f"SKILL.md routes to \"{name}\", but runbook.md has no such heading")
+for name in sorted(set(re.findall(r"`([\w-]+\.md)`", skill))):
+    if not (SKILL_DIR / name).is_file():
+        errors.append(f"SKILL.md names {name}, but skills/kickstart/ has no such file")
 for letters in re.findall(r"Appendi(?:x|ces) ([A-Z](?:, [A-Z])*)", skill):
     for letter in letters.split(", "):
         if not any(h.startswith(f"Appendix {letter} ") for h in headings):
@@ -58,7 +62,7 @@ for letters in re.findall(r"Appendi(?:x|ces) ([A-Z](?:, [A-Z])*)", skill):
 
 # 3. Block names
 phase2 = runbook.split("## Phase 2", 1)[1].split("## Phase 3", 1)[0]
-phase3 = runbook.split("## Phase 3", 1)[1].split("## Phase 4", 1)[0]
+phase3 = runbook.split("## Phase 3", 1)[1].split("## Appendix A", 1)[0]
 table = dict(re.findall(r"^\| (\w+) \| \*\*([^*]+)\*\*", phase2, re.M))
 heads = {k: v.split(" (")[0].strip() for k, v in re.findall(r"^### (\w+) — (.+)$", phase3, re.M)}
 readme_rows = dict(re.findall(r"^\| \*\*(\w+)\*\* \| ([^|]+?) \|", readme, re.M))
